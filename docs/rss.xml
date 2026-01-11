@@ -1,5 +1,378 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Blog Title</title><link>https://holding-one.github.io/blog</link><description>Blog description</description><copyright>Blog Title</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://github.githubassets.com/favicons/favicon.svg</url><title>avatar</title><link>https://holding-one.github.io/blog</link></image><lastBuildDate>Sun, 11 Jan 2026 12:43:42 +0000</lastBuildDate><managingEditor>Blog Title</managingEditor><ttl>60</ttl><webMaster>Blog Title</webMaster><item><title>递归解析JSON,解析后端使用ai返回的json格式</title><link>https://holding-one.github.io/blog/post/di-gui-jie-xi-JSON%2C-jie-xi-hou-duan-shi-yong-ai-fan-hui-de-json-ge-shi.html</link><description>/**
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Blog Title</title><link>https://holding-one.github.io/blog</link><description>Blog description</description><copyright>Blog Title</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://github.githubassets.com/favicons/favicon.svg</url><title>avatar</title><link>https://holding-one.github.io/blog</link></image><lastBuildDate>Sun, 11 Jan 2026 12:48:07 +0000</lastBuildDate><managingEditor>Blog Title</managingEditor><ttl>60</ttl><webMaster>Blog Title</webMaster><item><title>关于开发中会遇到的一些问题和解决</title><link>https://holding-one.github.io/blog/post/guan-yu-kai-fa-zhong-hui-yu-dao-de-yi-xie-wen-ti-he-jie-jue.html</link><description># 关于开发中会遇到的一些问题和解决
+
+### 常用的utils
+
+[常用方法](utils.js)
+
+
+
+### 1. 格式化时间
+
+Thu May 25 2023 11:59:24 GMT+0800 (中国标准时间)
+
+变 2023-10-20
+
+```js
+filterTime(data) {
+  //this.dateTime  是需要转换的值
+  let date = new Date(data);
+  let y = date.getFullYear();
+  let m = date.getMonth() + 1;
+  m = m &lt; 10 ? '0' + m : m;
+  let d = date.getDate();
+  d = d &lt; 10 ? '0' + d : d;
+  const time = y + '-' + m + '-' + d;
+  return time;
+},
+```
+
+
+
+### 2. eslitnt 保存自动格式化(需要安装插件)
+
+```js
+// #每次保存的时候将代码按eslint格式进行修复
+  'eslint.autoFixOnSave': true,
+  'editor.codeActionsOnSave': {
+    // 每次保存的时候将代码按eslint格式进行修复
+    'source.fixAll.eslint': true
+  },
+```
+
+ [App.vue](C:\Users\admin\Documents\WeChat Files\wxid_riioewzxwm3y22\FileStorage\File\2023-05\App.vue) 
+
+### 3. 固定列超出隐藏滑动显示布局
+
+```css
+    width: 100%;
+    margin-top: 1rem;
+    overflow-x: scroll;
+
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25% 25%;
+    grid: 0;  一行四个,多的向右划 然后向下换行
+```
+
+### 4.单行溢出隐藏
+
+英文溢出不会...
+
+小程序要用text标签
+
+```vue
+
+    display: -webkit-box; /*弹性伸缩盒子模型显示*/
+    -webkit-box-orient: vertical; /*排列方式*/
+    -webkit-line-clamp: 1; /*显示文本行数(这里控制多少行隐藏)*/
+    overflow: hidden; /*溢出隐藏*/
+```
+
+
+
+```css
+      span {
+        width: 158px;
+   		white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+多行
+div {
+  overflow:hidden;              //超出盒子宽度内容，便溢出隐藏  
+  text-overflow:ellipsis;       //用...省略号显示
+  display:-webkit-box;          //将对象作为弹性伸缩盒子模型显示
+  -webkit-box-orient:vertical;  //从上到下垂直排列子元素
+  -webkit-line-clamp:2;         //显示的行数
+}
+ 
+如果文本为一段很长的英文或者数字，则需要添加word-wrap: break-word属性
+```
+
+#### 5.伪元素背景图片
+
+```css
+.edit {
+  &amp;::after {
+    content: '';
+    background: url('@/static/img/edit.png') no-repeat 0% 8%,
+      url('@/static/img/delete.png') no-repeat 107% 8%;
+    background-size: 35rpx 35rpx;
+    width: 100rpx;
+    height: 40rpx;
+  }
+}
+```
+
+### 6.动态className
+
+```css
+              :class='{
+                eventing: item.status == 0,
+                eventNotStart: item.status == 1,
+                eventFinised: item.status == 2,
+              }'
+```
+
+
+
+### 7. 奇数行偶数行
+
+```css
+//奇数行
+    &amp;:nth-child(odd) {
+      background: #f4f7fa;
+    } 
+//偶数行
+    &amp;:nth-child(even) {
+    } 
+```
+
+### 8.新添加的属性添加响应式
+
+```js
+    async getCommonPerson() {
+      try {
+        let res = await this.$request.get(
+          '/mass/homePage/entryRecord/playerManageList',
+          {}
+        );
+        console.log(res);
+        // 最多四个
+        this.commonPerson = res.data.splice(0, 4) || [];
+
+        this.commonPerson.forEach((item, index) =&gt; {
+          this.$set(this.commonPerson[index], 'active', false); // vue2更新视图
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    chooseMessage(index) {
+      this.commonPerson.forEach((item) =&gt; {
+        item.active = false;
+      });
+      this.$set(this.commonPerson[index], 'active', true); // 改百年this.obj.e时 视图会更新
+
+
+      console.log(this.commonPerson);
+    },
+```
+
+### 9.生成二维码
+
+[教程](https://blog.csdn.net/weixin_42601136/article/details/114839489)
+
+```shell
+npm install vue-qr --save
+```
+
+```vue
+      &lt;vue-qr :text='inviteUrl' :size='200'&gt;&lt;/vue-qr&gt;
+
+import vueQr from 'vue-qr';
+
+  computed: {
+    vueQr
+  },
+```
+
+```js
+  this.inviteUrl =
+       'https://devops.yangtuo.cn/qthd/qthd_ydd/index.html#/pages/teamManagement/inviteToTheTeam?teamId=' +
+        this.teamId;
+```
+
+### 10. 点击复制
+
+```shell
+npm i vue-clipboard2
+```
+
+```js
+main.js
+
+import VueClipboard from 'vue-clipboard2'
+Vue.use(VueClipboard)
+
+```
+
+```vue
+      &lt;div
+        style='color: #4c5fe6; cursor: pointer'
+        :data-clipboard-text='detail.telephone'
+        @click='copy'
+      &gt;
+        联系电话：{{ detail.telephone }} 复制
+      &lt;/div&gt;
+```
+
+```vue
+    copy() {
+      //如果需要回调：
+      this.$copyText('需要复制的内容').then(
+        (e) =&gt; {
+          this.$notify({
+            title: '',
+            message: '复制成功',
+            type: 'success',
+          });
+          console.log(e);
+        },
+        function (e) {
+          this.$notify.error({
+            title: '',
+            message: '复制失败',
+            type: 'success',
+          });
+          console.log(e);
+        }
+      );
+    },
+```
+
+### 11.vscode的正则
+
+`^\s*(?=\r?$)\n` 替换空白行并删除的方法
+
+### 12. picker
+
+```vue
+        &lt;picker
+          class='type'
+          @change='typeConfirm'
+          :value='typeIndex'
+          :range='trainTypeList'
+          range-key='value'
+        &gt;
+          &lt;!-- &lt;view class='uni-input'&gt;{{ trainTypeList[index] }}&lt;/view&gt; --&gt;
+          &lt;view
+            class='uni-input'
+
+            &gt;{{ trainTypeList[typeIndex].value }}
+
+            &lt;view class='imgIcon'&gt; &lt;/view&gt;
+          &lt;/view&gt;
+        &lt;/picker&gt;
+```
+
+### 13. 手写canvas转图片
+
+```vue
+
+    &lt;u-mask
+      :show='posterShow'
+      :zoom='false'
+      :custom-style='{ background: 'rgba(0,0,0,.8)' }'
+      :duration='0'
+    &gt;
+      &lt;xinyu-canvas-drawer
+        ref='poster'
+        :width='750'
+        :height='1200'
+      &gt;&lt;/xinyu-canvas-drawer&gt;
+      &lt;image
+        :src='src'
+        style='width: 750rpx; height: 750rpx'
+        v-if='src != '''
+      &gt;&lt;/image&gt;
+      &lt;view class='bottomButton fixedBottom'&gt;
+        &lt;view class='button' @click='saveImageToPhotosAlbum'&gt; 下载海报 &lt;/view&gt;
+      &lt;/view&gt;
+      &lt;div class='close'&gt;
+        &lt;image
+          @click='posterShow = false'
+          src='../../../static/closeCycle.png'
+          mode='aspectFit'
+        /&gt;
+      &lt;/div&gt;
+    &lt;/u-mask&gt;
+
+&lt;script&gt;
+
+import XinyuCanvasDrawer from '@/uni_modules/xinyu-canvas-drawer/index.vue';
+    		  that.rederCanvas()
+    async rederCanvas() {
+      this.$nextTick(async () =&gt; {
+        let posterRef = this.$refs.poster;
+        uni.showLoading({
+          title: '渲染海报中',
+        });
+
+        let organizer = this.jobFairDetails.organizer || '';
+        let address = this.jobFairDetails.address || '';
+		let title = this.jobFairDetails.title || '';
+
+        await posterRef.init();
+        let notArr = posterRef
+          .setBackgroundColor('#F4F4F4') //指定渲染图片的背景色
+          .addImage('../../../static/posterBg.png', 0, 0, 750, 900, false)
+
+          .addImage('../../../static/ava.png', 32, 48, 80, 80, true) //绘制圆图片，如果不绘制圆图片最后一个参数可以不传或传false，当最后一个参数为true时圆形的直径为w，h参数将没有意义
+
+          .addText(title, 180, 60, 30, '#333', 453, false)
+          .addText('企业认证', 180, 100, 30, '#666', 453, false)
+
+          .addText('主办方', 50, 200, 30, '#666', 453, false)
+          .addText(organizer, 50, 250, 40, '#666', 453, false)
+
+          .addText('地点', 50, 650, 30, '#333', 453, false)
+          .addText(address, 50, 690, 30, '#d87161', 453, false)
+          .addText('参加企业', 50, 720, 30, '#666', 453, false)
+
+          .addRect(0, 900, 1000, 300, '#FEFEFE') //绘制矩形
+          .addText('西湖区就近就业', 19, 1000, 40, '#333', 453, false)
+          // .addText('长按图片保存或分享', 19, 1058, 20, '#666', 453, false)
+          .addQRCode('http://www.shengxinyustudio.com', 600, 990, 100, 100); //绘制二维码（不要太长否则会扫不出来）
+
+        this.enterpriseList.forEach((item, index) =&gt; {
+          notArr
+            .addRect(50 + index * 110, 760, 100, 30, '#feefec') //绘制矩形
+
+            .addText(
+              item.value,
+              80 + index * 100,
+              765,
+              20,
+              '#d87161',
+              453,
+              false
+            );
+        });
+
+        this.src = await notArr.draw();
+
+        this.isCanvasLoading = true;
+        uni.hideLoading();
+        this.$forceUpdate();
+      });
+    },
+    &lt;/script&gt;
+
+```
+
+### 14.html2canvas 页面转图片
+
+```vue
+&lt;script&gt;
+    generateImage() {
+      const element = document.getElementById('target-element'); // 替换为目标元素的id或class
+      html2canvas(element).then(canvas =&gt; {
+        const image = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = image;
+        link.download = 'image.png';
+        link.click();
+      });
+    },
+&lt;/script&gt;   
+
+```
+
+### 15.Object.assign同名属性的替换
+
+对于这种嵌套的对象，一旦遇到同名属性，**`Object.assign`**的处理方法是替换，而不是添加。</description><guid isPermaLink="true">https://holding-one.github.io/blog/post/guan-yu-kai-fa-zhong-hui-yu-dao-de-yi-xie-wen-ti-he-jie-jue.html</guid><pubDate>Sun, 11 Jan 2026 12:47:38 +0000</pubDate></item><item><title>递归解析JSON,解析后端使用ai返回的json格式</title><link>https://holding-one.github.io/blog/post/di-gui-jie-xi-JSON%2C-jie-xi-hou-duan-shi-yong-ai-fan-hui-de-json-ge-shi.html</link><description>/**
  * 智能JSON解析方法
  * @param {any} data - 需要解析的数据
  * @returns {any} 解析后的数据

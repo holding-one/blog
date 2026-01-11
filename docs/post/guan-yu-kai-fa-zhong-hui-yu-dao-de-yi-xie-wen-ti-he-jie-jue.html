@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://github.githubassets.com/favicons/favicon.svg"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="# 关于开发中会遇到的一些问题和解决
+
+### 常用的utils
+
+[常用方法](utils.js)
+
+
+
+### 1. 格式化时间
+
+Thu May 25 2023 11:59:24 GMT+0800 (中国标准时间)
+
+变 2023-10-20
+
+```js
+filterTime(data) {
+  //this.dateTime  是需要转换的值
+  let date = new Date(data);
+  let y = date.getFullYear();
+  let m = date.getMonth() + 1;
+  m = m < 10 ? '0' + m : m;
+  let d = date.getDate();
+  d = d < 10 ? '0' + d : d;
+  const time = y + '-' + m + '-' + d;
+  return time;
+},
+```
+
+
+
+### 2. eslitnt 保存自动格式化(需要安装插件)
+
+```js
+// #每次保存的时候将代码按eslint格式进行修复
+  'eslint.autoFixOnSave': true,
+  'editor.codeActionsOnSave': {
+    // 每次保存的时候将代码按eslint格式进行修复
+    'source.fixAll.eslint': true
+  },
+```
+
+ [App.vue](C:\Users\admin\Documents\WeChat Files\wxid_riioewzxwm3y22\FileStorage\File\2023-05\App.vue) 
+
+### 3. 固定列超出隐藏滑动显示布局
+
+```css
+    width: 100%;
+    margin-top: 1rem;
+    overflow-x: scroll;
+
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25% 25%;
+    grid: 0;  一行四个,多的向右划 然后向下换行
+```
+
+### 4.单行溢出隐藏
+
+英文溢出不会...
+
+小程序要用text标签
+
+```vue
+
+    display: -webkit-box; /*弹性伸缩盒子模型显示*/
+    -webkit-box-orient: vertical; /*排列方式*/
+    -webkit-line-clamp: 1; /*显示文本行数(这里控制多少行隐藏)*/
+    overflow: hidden; /*溢出隐藏*/
+```
+
+
+
+```css
+      span {
+        width: 158px;
+   		white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+多行
+div {
+  overflow:hidden;              //超出盒子宽度内容，便溢出隐藏  
+  text-overflow:ellipsis;       //用...省略号显示
+  display:-webkit-box;          //将对象作为弹性伸缩盒子模型显示
+  -webkit-box-orient:vertical;  //从上到下垂直排列子元素
+  -webkit-line-clamp:2;         //显示的行数
+}
+ 
+如果文本为一段很长的英文或者数字，则需要添加word-wrap: break-word属性
+```
+
+#### 5.伪元素背景图片
+
+```css
+.edit {
+  &::after {
+    content: '';
+    background: url('@/static/img/edit.png') no-repeat 0% 8%,
+      url('@/static/img/delete.png') no-repeat 107% 8%;
+    background-size: 35rpx 35rpx;
+    width: 100rpx;
+    height: 40rpx;
+  }
+}
+```
+
+### 6.动态className
+
+```css
+              :class='{
+                eventing: item.status == 0,
+                eventNotStart: item.status == 1,
+                eventFinised: item.status == 2,
+              }'
+```
+
+
+
+### 7. 奇数行偶数行
+
+```css
+//奇数行
+    &:nth-child(odd) {
+      background: #f4f7fa;
+    } 
+//偶数行
+    &:nth-child(even) {
+    } 
+```
+
+### 8.新添加的属性添加响应式
+
+```js
+    async getCommonPerson() {
+      try {
+        let res = await this.$request.get(
+          '/mass/homePage/entryRecord/playerManageList',
+          {}
+        );
+        console.log(res);
+        // 最多四个
+        this.commonPerson = res.data.splice(0, 4) || [];
+
+        this.commonPerson.forEach((item, index) => {
+          this.$set(this.commonPerson[index], 'active', false); // vue2更新视图
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    chooseMessage(index) {
+      this.commonPerson.forEach((item) => {
+        item.active = false;
+      });
+      this.$set(this.commonPerson[index], 'active', true); // 改百年this.obj.e时 视图会更新
+
+
+      console.log(this.commonPerson);
+    },
+```
+
+### 9.生成二维码
+
+[教程](https://blog.csdn.net/weixin_42601136/article/details/114839489)
+
+```shell
+npm install vue-qr --save
+```
+
+```vue
+      <vue-qr :text='inviteUrl' :size='200'></vue-qr>
+
+import vueQr from 'vue-qr';
+
+  computed: {
+    vueQr
+  },
+```
+
+```js
+  this.inviteUrl =
+       'https://devops.yangtuo.cn/qthd/qthd_ydd/index.html#/pages/teamManagement/inviteToTheTeam?teamId=' +
+        this.teamId;
+```
+
+### 10. 点击复制
+
+```shell
+npm i vue-clipboard2
+```
+
+```js
+main.js
+
+import VueClipboard from 'vue-clipboard2'
+Vue.use(VueClipboard)
+
+```
+
+```vue
+      <div
+        style='color: #4c5fe6; cursor: pointer'
+        :data-clipboard-text='detail.telephone'
+        @click='copy'
+      >
+        联系电话：{{ detail.telephone }} 复制
+      </div>
+```
+
+```vue
+    copy() {
+      //如果需要回调：
+      this.$copyText('需要复制的内容').then(
+        (e) => {
+          this.$notify({
+            title: '',
+            message: '复制成功',
+            type: 'success',
+          });
+          console.log(e);
+        },
+        function (e) {
+          this.$notify.error({
+            title: '',
+            message: '复制失败',
+            type: 'success',
+          });
+          console.log(e);
+        }
+      );
+    },
+```
+
+### 11.vscode的正则
+
+`^\s*(?=\r?$)\n` 替换空白行并删除的方法
+
+### 12. picker
+
+```vue
+        <picker
+          class='type'
+          @change='typeConfirm'
+          :value='typeIndex'
+          :range='trainTypeList'
+          range-key='value'
+        >
+          <!-- <view class='uni-input'>{{ trainTypeList[index] }}</view> -->
+          <view
+            class='uni-input'
+
+            >{{ trainTypeList[typeIndex].value }}
+
+            <view class='imgIcon'> </view>
+          </view>
+        </picker>
+```
+
+### 13. 手写canvas转图片
+
+```vue
+
+    <u-mask
+      :show='posterShow'
+      :zoom='false'
+      :custom-style='{ background: 'rgba(0,0,0,.8)' }'
+      :duration='0'
+    >
+      <xinyu-canvas-drawer
+        ref='poster'
+        :width='750'
+        :height='1200'
+      ></xinyu-canvas-drawer>
+      <image
+        :src='src'
+        style='width: 750rpx; height: 750rpx'
+        v-if='src != '''
+      ></image>
+      <view class='bottomButton fixedBottom'>
+        <view class='button' @click='saveImageToPhotosAlbum'> 下载海报 </view>
+      </view>
+      <div class='close'>
+        <image
+          @click='posterShow = false'
+          src='../../../static/closeCycle.png'
+          mode='aspectFit'
+        />
+      </div>
+    </u-mask>
+
+<script>
+
+import XinyuCanvasDrawer from '@/uni_modules/xinyu-canvas-drawer/index.vue';
+    		  that.rederCanvas()
+    async rederCanvas() {
+      this.$nextTick(async () => {
+        let posterRef = this.$refs.poster;
+        uni.showLoading({
+          title: '渲染海报中',
+        });
+
+        let organizer = this.jobFairDetails.organizer || '';
+        let address = this.jobFairDetails.address || '';
+		let title = this.jobFairDetails.title || '';
+
+        await posterRef.init();
+        let notArr = posterRef
+          .setBackgroundColor('#F4F4F4') //指定渲染图片的背景色
+          .addImage('../../../static/posterBg.png', 0, 0, 750, 900, false)
+
+          .addImage('../../../static/ava.png', 32, 48, 80, 80, true) //绘制圆图片，如果不绘制圆图片最后一个参数可以不传或传false，当最后一个参数为true时圆形的直径为w，h参数将没有意义
+
+          .addText(title, 180, 60, 30, '#333', 453, false)
+          .addText('企业认证', 180, 100, 30, '#666', 453, false)
+
+          .addText('主办方', 50, 200, 30, '#666', 453, false)
+          .addText(organizer, 50, 250, 40, '#666', 453, false)
+
+          .addText('地点', 50, 650, 30, '#333', 453, false)
+          .addText(address, 50, 690, 30, '#d87161', 453, false)
+          .addText('参加企业', 50, 720, 30, '#666', 453, false)
+
+          .addRect(0, 900, 1000, 300, '#FEFEFE') //绘制矩形
+          .addText('西湖区就近就业', 19, 1000, 40, '#333', 453, false)
+          // .addText('长按图片保存或分享', 19, 1058, 20, '#666', 453, false)
+          .addQRCode('http://www.shengxinyustudio.com', 600, 990, 100, 100); //绘制二维码（不要太长否则会扫不出来）
+
+        this.enterpriseList.forEach((item, index) => {
+          notArr
+            .addRect(50 + index * 110, 760, 100, 30, '#feefec') //绘制矩形
+
+            .addText(
+              item.value,
+              80 + index * 100,
+              765,
+              20,
+              '#d87161',
+              453,
+              false
+            );
+        });
+
+        this.src = await notArr.draw();
+
+        this.isCanvasLoading = true;
+        uni.hideLoading();
+        this.$forceUpdate();
+      });
+    },
+    </script>
+
+```
+
+### 14.html2canvas 页面转图片
+
+```vue
+<script>
+    generateImage() {
+      const element = document.getElementById('target-element'); // 替换为目标元素的id或class
+      html2canvas(element).then(canvas => {
+        const image = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = image;
+        link.download = 'image.png';
+        link.click();
+      });
+    },
+</script>   
+
+```
+
+### 15.Object.assign同名属性的替换
+
+对于这种嵌套的对象，一旦遇到同名属性，**`Object.assign`**的处理方法是替换，而不是添加。">
+<meta property="og:title" content="关于开发中会遇到的一些问题和解决">
+<meta property="og:description" content="# 关于开发中会遇到的一些问题和解决
+
+### 常用的utils
+
+[常用方法](utils.js)
+
+
+
+### 1. 格式化时间
+
+Thu May 25 2023 11:59:24 GMT+0800 (中国标准时间)
+
+变 2023-10-20
+
+```js
+filterTime(data) {
+  //this.dateTime  是需要转换的值
+  let date = new Date(data);
+  let y = date.getFullYear();
+  let m = date.getMonth() + 1;
+  m = m < 10 ? '0' + m : m;
+  let d = date.getDate();
+  d = d < 10 ? '0' + d : d;
+  const time = y + '-' + m + '-' + d;
+  return time;
+},
+```
+
+
+
+### 2. eslitnt 保存自动格式化(需要安装插件)
+
+```js
+// #每次保存的时候将代码按eslint格式进行修复
+  'eslint.autoFixOnSave': true,
+  'editor.codeActionsOnSave': {
+    // 每次保存的时候将代码按eslint格式进行修复
+    'source.fixAll.eslint': true
+  },
+```
+
+ [App.vue](C:\Users\admin\Documents\WeChat Files\wxid_riioewzxwm3y22\FileStorage\File\2023-05\App.vue) 
+
+### 3. 固定列超出隐藏滑动显示布局
+
+```css
+    width: 100%;
+    margin-top: 1rem;
+    overflow-x: scroll;
+
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25% 25%;
+    grid: 0;  一行四个,多的向右划 然后向下换行
+```
+
+### 4.单行溢出隐藏
+
+英文溢出不会...
+
+小程序要用text标签
+
+```vue
+
+    display: -webkit-box; /*弹性伸缩盒子模型显示*/
+    -webkit-box-orient: vertical; /*排列方式*/
+    -webkit-line-clamp: 1; /*显示文本行数(这里控制多少行隐藏)*/
+    overflow: hidden; /*溢出隐藏*/
+```
+
+
+
+```css
+      span {
+        width: 158px;
+   		white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+多行
+div {
+  overflow:hidden;              //超出盒子宽度内容，便溢出隐藏  
+  text-overflow:ellipsis;       //用...省略号显示
+  display:-webkit-box;          //将对象作为弹性伸缩盒子模型显示
+  -webkit-box-orient:vertical;  //从上到下垂直排列子元素
+  -webkit-line-clamp:2;         //显示的行数
+}
+ 
+如果文本为一段很长的英文或者数字，则需要添加word-wrap: break-word属性
+```
+
+#### 5.伪元素背景图片
+
+```css
+.edit {
+  &::after {
+    content: '';
+    background: url('@/static/img/edit.png') no-repeat 0% 8%,
+      url('@/static/img/delete.png') no-repeat 107% 8%;
+    background-size: 35rpx 35rpx;
+    width: 100rpx;
+    height: 40rpx;
+  }
+}
+```
+
+### 6.动态className
+
+```css
+              :class='{
+                eventing: item.status == 0,
+                eventNotStart: item.status == 1,
+                eventFinised: item.status == 2,
+              }'
+```
+
+
+
+### 7. 奇数行偶数行
+
+```css
+//奇数行
+    &:nth-child(odd) {
+      background: #f4f7fa;
+    } 
+//偶数行
+    &:nth-child(even) {
+    } 
+```
+
+### 8.新添加的属性添加响应式
+
+```js
+    async getCommonPerson() {
+      try {
+        let res = await this.$request.get(
+          '/mass/homePage/entryRecord/playerManageList',
+          {}
+        );
+        console.log(res);
+        // 最多四个
+        this.commonPerson = res.data.splice(0, 4) || [];
+
+        this.commonPerson.forEach((item, index) => {
+          this.$set(this.commonPerson[index], 'active', false); // vue2更新视图
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    chooseMessage(index) {
+      this.commonPerson.forEach((item) => {
+        item.active = false;
+      });
+      this.$set(this.commonPerson[index], 'active', true); // 改百年this.obj.e时 视图会更新
+
+
+      console.log(this.commonPerson);
+    },
+```
+
+### 9.生成二维码
+
+[教程](https://blog.csdn.net/weixin_42601136/article/details/114839489)
+
+```shell
+npm install vue-qr --save
+```
+
+```vue
+      <vue-qr :text='inviteUrl' :size='200'></vue-qr>
+
+import vueQr from 'vue-qr';
+
+  computed: {
+    vueQr
+  },
+```
+
+```js
+  this.inviteUrl =
+       'https://devops.yangtuo.cn/qthd/qthd_ydd/index.html#/pages/teamManagement/inviteToTheTeam?teamId=' +
+        this.teamId;
+```
+
+### 10. 点击复制
+
+```shell
+npm i vue-clipboard2
+```
+
+```js
+main.js
+
+import VueClipboard from 'vue-clipboard2'
+Vue.use(VueClipboard)
+
+```
+
+```vue
+      <div
+        style='color: #4c5fe6; cursor: pointer'
+        :data-clipboard-text='detail.telephone'
+        @click='copy'
+      >
+        联系电话：{{ detail.telephone }} 复制
+      </div>
+```
+
+```vue
+    copy() {
+      //如果需要回调：
+      this.$copyText('需要复制的内容').then(
+        (e) => {
+          this.$notify({
+            title: '',
+            message: '复制成功',
+            type: 'success',
+          });
+          console.log(e);
+        },
+        function (e) {
+          this.$notify.error({
+            title: '',
+            message: '复制失败',
+            type: 'success',
+          });
+          console.log(e);
+        }
+      );
+    },
+```
+
+### 11.vscode的正则
+
+`^\s*(?=\r?$)\n` 替换空白行并删除的方法
+
+### 12. picker
+
+```vue
+        <picker
+          class='type'
+          @change='typeConfirm'
+          :value='typeIndex'
+          :range='trainTypeList'
+          range-key='value'
+        >
+          <!-- <view class='uni-input'>{{ trainTypeList[index] }}</view> -->
+          <view
+            class='uni-input'
+
+            >{{ trainTypeList[typeIndex].value }}
+
+            <view class='imgIcon'> </view>
+          </view>
+        </picker>
+```
+
+### 13. 手写canvas转图片
+
+```vue
+
+    <u-mask
+      :show='posterShow'
+      :zoom='false'
+      :custom-style='{ background: 'rgba(0,0,0,.8)' }'
+      :duration='0'
+    >
+      <xinyu-canvas-drawer
+        ref='poster'
+        :width='750'
+        :height='1200'
+      ></xinyu-canvas-drawer>
+      <image
+        :src='src'
+        style='width: 750rpx; height: 750rpx'
+        v-if='src != '''
+      ></image>
+      <view class='bottomButton fixedBottom'>
+        <view class='button' @click='saveImageToPhotosAlbum'> 下载海报 </view>
+      </view>
+      <div class='close'>
+        <image
+          @click='posterShow = false'
+          src='../../../static/closeCycle.png'
+          mode='aspectFit'
+        />
+      </div>
+    </u-mask>
+
+<script>
+
+import XinyuCanvasDrawer from '@/uni_modules/xinyu-canvas-drawer/index.vue';
+    		  that.rederCanvas()
+    async rederCanvas() {
+      this.$nextTick(async () => {
+        let posterRef = this.$refs.poster;
+        uni.showLoading({
+          title: '渲染海报中',
+        });
+
+        let organizer = this.jobFairDetails.organizer || '';
+        let address = this.jobFairDetails.address || '';
+		let title = this.jobFairDetails.title || '';
+
+        await posterRef.init();
+        let notArr = posterRef
+          .setBackgroundColor('#F4F4F4') //指定渲染图片的背景色
+          .addImage('../../../static/posterBg.png', 0, 0, 750, 900, false)
+
+          .addImage('../../../static/ava.png', 32, 48, 80, 80, true) //绘制圆图片，如果不绘制圆图片最后一个参数可以不传或传false，当最后一个参数为true时圆形的直径为w，h参数将没有意义
+
+          .addText(title, 180, 60, 30, '#333', 453, false)
+          .addText('企业认证', 180, 100, 30, '#666', 453, false)
+
+          .addText('主办方', 50, 200, 30, '#666', 453, false)
+          .addText(organizer, 50, 250, 40, '#666', 453, false)
+
+          .addText('地点', 50, 650, 30, '#333', 453, false)
+          .addText(address, 50, 690, 30, '#d87161', 453, false)
+          .addText('参加企业', 50, 720, 30, '#666', 453, false)
+
+          .addRect(0, 900, 1000, 300, '#FEFEFE') //绘制矩形
+          .addText('西湖区就近就业', 19, 1000, 40, '#333', 453, false)
+          // .addText('长按图片保存或分享', 19, 1058, 20, '#666', 453, false)
+          .addQRCode('http://www.shengxinyustudio.com', 600, 990, 100, 100); //绘制二维码（不要太长否则会扫不出来）
+
+        this.enterpriseList.forEach((item, index) => {
+          notArr
+            .addRect(50 + index * 110, 760, 100, 30, '#feefec') //绘制矩形
+
+            .addText(
+              item.value,
+              80 + index * 100,
+              765,
+              20,
+              '#d87161',
+              453,
+              false
+            );
+        });
+
+        this.src = await notArr.draw();
+
+        this.isCanvasLoading = true;
+        uni.hideLoading();
+        this.$forceUpdate();
+      });
+    },
+    </script>
+
+```
+
+### 14.html2canvas 页面转图片
+
+```vue
+<script>
+    generateImage() {
+      const element = document.getElementById('target-element'); // 替换为目标元素的id或class
+      html2canvas(element).then(canvas => {
+        const image = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = image;
+        link.download = 'image.png';
+        link.click();
+      });
+    },
+</script>   
+
+```
+
+### 15.Object.assign同名属性的替换
+
+对于这种嵌套的对象，一旦遇到同名属性，**`Object.assign`**的处理方法是替换，而不是添加。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://holding-one.github.io/blog/post/guan-yu-kai-fa-zhong-hui-yu-dao-de-yi-xie-wen-ti-he-jie-jue.html">
+<meta property="og:image" content="https://github.githubassets.com/favicons/favicon.svg">
+<title>关于开发中会遇到的一些问题和解决</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">关于开发中会遇到的一些问题和解决</h1>
+<div class="title-right">
+    <a href="https://holding-one.github.io/blog" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/holding-one/blog/issues/2" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>关于开发中会遇到的一些问题和解决</h1>
+<h3>常用的utils</h3>
+<p><a href="utils.js">常用方法</a></p>
+<h3>1. 格式化时间</h3>
+<p>Thu May 25 2023 11:59:24 GMT+0800 (中国标准时间)</p>
+<p>变 2023-10-20</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-en">filterTime</span><span class="pl-kos">(</span><span class="pl-s1">data</span><span class="pl-kos">)</span><span class="pl-kos"></span> <span class="pl-kos">{</span>
+  <span class="pl-c">//this.dateTime  是需要转换的值</span>
+  <span class="pl-k">let</span> <span class="pl-s1">date</span> <span class="pl-c1">=</span> <span class="pl-k">new</span> <span class="pl-v">Date</span><span class="pl-kos">(</span><span class="pl-s1">data</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-k">let</span> <span class="pl-s1">y</span> <span class="pl-c1">=</span> <span class="pl-s1">date</span><span class="pl-kos">.</span><span class="pl-en">getFullYear</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-k">let</span> <span class="pl-s1">m</span> <span class="pl-c1">=</span> <span class="pl-s1">date</span><span class="pl-kos">.</span><span class="pl-en">getMonth</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span><span class="pl-kos">;</span>
+  <span class="pl-s1">m</span> <span class="pl-c1">=</span> <span class="pl-s1">m</span> <span class="pl-c1">&lt;</span> <span class="pl-c1">10</span> ? <span class="pl-s">"0"</span> <span class="pl-c1">+</span> <span class="pl-s1">m</span> : <span class="pl-s1">m</span><span class="pl-kos">;</span>
+  <span class="pl-k">let</span> <span class="pl-s1">d</span> <span class="pl-c1">=</span> <span class="pl-s1">date</span><span class="pl-kos">.</span><span class="pl-en">getDate</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-s1">d</span> <span class="pl-c1">=</span> <span class="pl-s1">d</span> <span class="pl-c1">&lt;</span> <span class="pl-c1">10</span> ? <span class="pl-s">"0"</span> <span class="pl-c1">+</span> <span class="pl-s1">d</span> : <span class="pl-s1">d</span><span class="pl-kos">;</span>
+  <span class="pl-k">const</span> <span class="pl-s1">time</span> <span class="pl-c1">=</span> <span class="pl-s1">y</span> <span class="pl-c1">+</span> <span class="pl-s">"-"</span> <span class="pl-c1">+</span> <span class="pl-s1">m</span> <span class="pl-c1">+</span> <span class="pl-s">"-"</span> <span class="pl-c1">+</span> <span class="pl-s1">d</span><span class="pl-kos">;</span>
+  <span class="pl-k">return</span> <span class="pl-s1">time</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span><span class="pl-kos">,</span></pre></div>
+<h3>2. eslitnt 保存自动格式化(需要安装插件)</h3>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// #每次保存的时候将代码按eslint格式进行修复</span>
+  <span class="pl-s">"eslint.autoFixOnSave"</span>: <span class="pl-c1">true</span><span class="pl-kos">,</span>
+  <span class="pl-s">"editor.codeActionsOnSave"</span>: <span class="pl-kos">{</span>
+    <span class="pl-c">// 每次保存的时候将代码按eslint格式进行修复</span>
+    <span class="pl-s">"source.fixAll.eslint"</span>: <span class="pl-c1">true</span>
+  <span class="pl-kos">}</span><span class="pl-kos">,</span></pre></div>
+<p>[App.vue](C:\Users\admin\Documents\WeChat Files\wxid_riioewzxwm3y22\FileStorage\File\2023-05\App.vue)</p>
+<h3>3. 固定列超出隐藏滑动显示布局</h3>
+<div class="highlight highlight-source-css"><pre class="notranslate">  <span class="pl-ent"> </span> <span class="pl-ent">width</span><span class="pl-kos">:</span> 100%;
+    margin<span class="pl-c1">-</span><span class="pl-k">to</span>p<span class="pl-kos">:</span> 1rem;
+    overflow<span class="pl-c1">-</span>x<span class="pl-kos">:</span> scroll;
+
+    d<span class="pl-c1">is</span>play<span class="pl-kos">:</span> grid;
+    grid<span class="pl-c1">-</span>template-columns<span class="pl-kos">:</span> 25% 25% 25% 25% 25%;
+    grid<span class="pl-kos">:</span> 0;  一行四个<span class="pl-kos">,</span>多的向右划 然后向下换行</pre></div>
+<h3>4.单行溢出隐藏</h3>
+<p>英文溢出不会...</p>
+<p>小程序要用text标签</p>
+<div class="highlight highlight-source-vue"><pre class="notranslate">    display: -webkit-box; /*弹性伸缩盒子模型显示*/
+    -webkit-box-orient: vertical; /*排列方式*/
+    -webkit-line-clamp: 1; /*显示文本行数(这里控制多少行隐藏)*/
+    overflow: hidden; /*溢出隐藏*/</pre></div>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-ent"> </span>     span {
+        <span class="pl-c1">width</span><span class="pl-kos">:</span> <span class="pl-c1">158<span class="pl-smi">px</span></span>;
+   		<span class="pl-c1">white-space</span><span class="pl-kos">:</span> nowrap;
+        <span class="pl-c1">text-overflow</span><span class="pl-kos">:</span> ellipsis;
+        <span class="pl-c1">overflow</span><span class="pl-kos">:</span> hidden;
+<span class="pl-ent"> </span>     }
+多行
+div {
+  <span class="pl-c1">overflow</span><span class="pl-kos">:</span>hidden;              //超出盒子宽度内容，便溢出隐藏  
+  <span class="pl-c1">text-overflow</span><span class="pl-kos">:</span>ellipsis;       //用...省略号显示
+  <span class="pl-c1">display</span><span class="pl-kos">:</span>-webkit-box;          //将对象作为弹性伸缩盒子模型显示
+  <span class="pl-c1">-webkit-box-orient</span><span class="pl-kos">:</span>vertical;  //从上到下垂直排列子元素
+  <span class="pl-c1">-webkit-line-clamp</span><span class="pl-kos">:</span><span class="pl-c1">2</span>;         //显示的行数
+}
+ 
+如果文本为一段很长的英文或者数字，则需要添加w<span class="pl-c1">or</span>d<span class="pl-c1">-</span>wrap<span class="pl-kos">:</span> break<span class="pl-c1">-</span>w<span class="pl-c1">or</span>d属性</pre></div>
+<h4>5.伪元素背景图片</h4>
+<div class="highlight highlight-source-css"><pre class="notranslate">.<span class="pl-c1">edit</span> {
+<span class="pl-c1"> </span> <span class="pl-ent">&amp;</span>::<span class="pl-c1">after</span> {
+  <span class="pl-ent"> </span> <span class="pl-ent">content</span><span class="pl-kos">:</span> "<span class="pl-s">";</span>
+<span class="pl-s">    background: url("</span>@<span class="pl-c1">/</span>static<span class="pl-c1">/</span>img<span class="pl-c1">/</span>edit.<span class="pl-c1">png</span><span class="pl-s">") no-repeat 0% 8%,</span>
+<span class="pl-s">      url("</span>@<span class="pl-c1">/</span>static<span class="pl-c1">/</span>img<span class="pl-c1">/</span>delete.<span class="pl-c1">png</span>") no-repeat 107% 8%;
+    background-size: 35rpx 35rpx;
+    width: 100rpx;
+    height: 40rpx;
+  }
+}</pre></div>
+<h3>6.动态className</h3>
+<div class="highlight highlight-source-css"><pre class="notranslate">              <span class="pl-kos">:</span><span class="pl-c1">class</span><span class="pl-c1">=</span><span class="pl-s">"{</span>
+<span class="pl-s">                eventing: item.status == 0,</span>
+<span class="pl-s">                eventNotStart: item.status == 1,</span>
+<span class="pl-s">                eventFinised: item.status == 2,</span>
+<span class="pl-s">              }"</span></pre></div>
+<h3>7. 奇数行偶数行</h3>
+<div class="highlight highlight-source-css"><pre class="notranslate">//奇数行
+    <span class="pl-ent">&amp;</span><span class="pl-kos">:</span><span class="pl-c1">nth-child</span>(odd) {
+      <span class="pl-c1">background</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>f4f7fa</span>;
+    } 
+//偶数行
+    <span class="pl-ent">&amp;</span><span class="pl-kos">:</span><span class="pl-c1">nth-child</span>(even) {
+    } </pre></div>
+<h3>8.新添加的属性添加响应式</h3>
+<div class="highlight highlight-source-js"><pre class="notranslate">    <span class="pl-k">async</span> <span class="pl-s1">getCommonPerson</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-k">try</span> <span class="pl-kos">{</span>
+        <span class="pl-k">let</span> <span class="pl-s1">res</span> <span class="pl-c1">=</span> <span class="pl-k">await</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">$request</span><span class="pl-kos">.</span><span class="pl-en">get</span><span class="pl-kos">(</span>
+          <span class="pl-s">"/mass/homePage/entryRecord/playerManageList"</span><span class="pl-kos">,</span>
+          <span class="pl-kos">{</span><span class="pl-kos">}</span>
+        <span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-smi">console</span><span class="pl-kos">.</span><span class="pl-en">log</span><span class="pl-kos">(</span><span class="pl-s1">res</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-c">// 最多四个</span>
+        <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">commonPerson</span> <span class="pl-c1">=</span> <span class="pl-s1">res</span><span class="pl-kos">.</span><span class="pl-c1">data</span><span class="pl-kos">.</span><span class="pl-en">splice</span><span class="pl-kos">(</span><span class="pl-c1">0</span><span class="pl-kos">,</span> <span class="pl-c1">4</span><span class="pl-kos">)</span> <span class="pl-c1">||</span> <span class="pl-kos">[</span><span class="pl-kos">]</span><span class="pl-kos">;</span>
+
+        <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">commonPerson</span><span class="pl-kos">.</span><span class="pl-en">forEach</span><span class="pl-kos">(</span><span class="pl-kos">(</span><span class="pl-s1">item</span><span class="pl-kos">,</span> <span class="pl-s1">index</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-kos">{</span>
+          <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">$set</span><span class="pl-kos">(</span><span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">commonPerson</span><span class="pl-kos">[</span><span class="pl-s1">index</span><span class="pl-kos">]</span><span class="pl-kos">,</span> <span class="pl-s">"active"</span><span class="pl-kos">,</span> <span class="pl-c1">false</span><span class="pl-kos">)</span><span class="pl-kos">;</span> <span class="pl-c">// vue2更新视图</span>
+        <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+      <span class="pl-kos">}</span> <span class="pl-k">catch</span> <span class="pl-kos">(</span><span class="pl-s1">error</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-smi">console</span><span class="pl-kos">.</span><span class="pl-en">log</span><span class="pl-kos">(</span><span class="pl-s1">error</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+      <span class="pl-kos">}</span>
+    <span class="pl-kos">}</span><span class="pl-kos">,</span>
+
+    <span class="pl-en">chooseMessage</span><span class="pl-kos">(</span><span class="pl-s1">index</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">commonPerson</span><span class="pl-kos">.</span><span class="pl-en">forEach</span><span class="pl-kos">(</span><span class="pl-kos">(</span><span class="pl-s1">item</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-kos">{</span>
+        <span class="pl-s1">item</span><span class="pl-kos">.</span><span class="pl-c1">active</span> <span class="pl-c1">=</span> <span class="pl-c1">false</span><span class="pl-kos">;</span>
+      <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+      <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">$set</span><span class="pl-kos">(</span><span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">commonPerson</span><span class="pl-kos">[</span><span class="pl-s1">index</span><span class="pl-kos">]</span><span class="pl-kos">,</span> <span class="pl-s">"active"</span><span class="pl-kos">,</span> <span class="pl-c1">true</span><span class="pl-kos">)</span><span class="pl-kos">;</span> <span class="pl-c">// 改百年this.obj.e时 视图会更新</span>
+
+
+      <span class="pl-smi">console</span><span class="pl-kos">.</span><span class="pl-en">log</span><span class="pl-kos">(</span><span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">commonPerson</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span><span class="pl-kos">,</span></pre></div>
+<h3>9.生成二维码</h3>
+<p><a href="https://blog.csdn.net/weixin_42601136/article/details/114839489" rel="nofollow">教程</a></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">npm install vue-qr --save</pre></div>
+<div class="highlight highlight-source-vue"><pre class="notranslate">      &lt;<span class="pl-ent">vue-qr</span> :<span class="pl-e">text</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-smi">inviteUrl</span></span><span class="pl-pds">"</span> :<span class="pl-e">size</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-c1">200</span></span><span class="pl-pds">"</span>&gt;&lt;/<span class="pl-ent">vue-qr</span>&gt;
+
+import vueQr from "vue-qr";
+
+  computed: {
+    vueQr
+  },</pre></div>
+<div class="highlight highlight-source-js"><pre class="notranslate">  <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">inviteUrl</span> <span class="pl-c1">=</span>
+       <span class="pl-s">"https://devops.yangtuo.cn/qthd/qthd_ydd/index.html#/pages/teamManagement/inviteToTheTeam?teamId="</span> <span class="pl-c1">+</span>
+        <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">teamId</span><span class="pl-kos">;</span></pre></div>
+<h3>10. 点击复制</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">npm i vue-clipboard2</pre></div>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">main</span><span class="pl-kos">.</span><span class="pl-c1">js</span>
+
+<span class="pl-k">import</span> <span class="pl-v">VueClipboard</span> <span class="pl-k">from</span> <span class="pl-s">'vue-clipboard2'</span>
+<span class="pl-v">Vue</span><span class="pl-kos">.</span><span class="pl-en">use</span><span class="pl-kos">(</span><span class="pl-v">VueClipboard</span><span class="pl-kos">)</span></pre></div>
+<div class="highlight highlight-source-vue"><pre class="notranslate">      &lt;<span class="pl-ent">div</span>
+        <span class="pl-e">style</span>=<span class="pl-s1"><span class="pl-pds">"</span><span class="pl-c1"><span class="pl-c1">color</span></span>: <span class="pl-c1">#4c5fe6</span>; <span class="pl-c1"><span class="pl-c1">cursor</span></span>: <span class="pl-c1">pointer</span><span class="pl-pds">"</span></span>
+        :<span class="pl-e">data-clipboard-text</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-smi">detail</span>.<span class="pl-smi">telephone</span></span><span class="pl-pds">"</span>
+        @<span class="pl-e">click</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-smi">copy</span></span><span class="pl-pds">"</span>
+      &gt;
+        联系电话：{{ detail.telephone }} 复制
+      &lt;/<span class="pl-ent">div</span>&gt;</pre></div>
+<div class="highlight highlight-source-vue"><pre class="notranslate">    copy() {
+      //如果需要回调：
+      this.$copyText("需要复制的内容").then(
+        (e) =&gt; {
+          this.$notify({
+            title: "",
+            message: "复制成功",
+            type: "success",
+          });
+          console.log(e);
+        },
+        function (e) {
+          this.$notify.error({
+            title: "",
+            message: "复制失败",
+            type: "success",
+          });
+          console.log(e);
+        }
+      );
+    },</pre></div>
+<h3>11.vscode的正则</h3>
+<p><code class="notranslate">^\s*(?=\r?$)\n</code> 替换空白行并删除的方法</p>
+<h3>12. picker</h3>
+<div class="highlight highlight-source-vue"><pre class="notranslate">        &lt;<span class="pl-ent">picker</span>
+          class="type"
+          @<span class="pl-e">change</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-smi">typeConfirm</span></span><span class="pl-pds">"</span>
+          :<span class="pl-e">value</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-smi">typeIndex</span></span><span class="pl-pds">"</span>
+          :<span class="pl-e">range</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-smi">trainTypeList</span></span><span class="pl-pds">"</span>
+          range-key="value"
+        &gt;
+          &lt;!-- &lt;view class="uni-input"&gt;{{ trainTypeList[index] }}&lt;/view&gt; --&gt;
+          &lt;view
+            class="uni-input"
+
+            &gt;{{ trainTypeList[typeIndex].value }}
+
+            &lt;view class="imgIcon"&gt; &lt;/view&gt;
+          &lt;/view&gt;
+        &lt;/<span class="pl-ent">picker</span>&gt;</pre></div>
+<h3>13. 手写canvas转图片</h3>
+<div class="highlight highlight-source-vue"><pre class="notranslate">    &lt;<span class="pl-ent">u-mask</span>
+      :<span class="pl-e">show</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-smi">posterShow</span></span><span class="pl-pds">"</span>
+      :<span class="pl-e">zoom</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-c1">false</span></span><span class="pl-pds">"</span>
+      :<span class="pl-e">custom-style</span>=<span class="pl-pds">"</span><span class="pl-s1">{ background: <span class="pl-s"><span class="pl-pds">'</span>rgba(0,0,0,.8)<span class="pl-pds">'</span></span> }</span><span class="pl-pds">"</span>
+      :<span class="pl-e">duration</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-c1">0</span></span><span class="pl-pds">"</span>
+    &gt;
+      &lt;xinyu-canvas-drawer
+        ref="poster"
+        :width="750"
+        :height="1200"
+      &gt;&lt;/xinyu-canvas-drawer&gt;
+      &lt;image
+        :src="src"
+        style="width: 750rpx; height: 750rpx"
+        v-if="src != ''"
+      &gt;&lt;/image&gt;
+      &lt;view class="bottomButton fixedBottom"&gt;
+        &lt;view class="button" @click="saveImageToPhotosAlbum"&gt; 下载海报 &lt;/view&gt;
+      &lt;/view&gt;
+      &lt;div class="close"&gt;
+        &lt;image
+          @click="posterShow = false"
+          src="../../../static/closeCycle.png"
+          mode="aspectFit"
+        /&gt;
+      &lt;/div&gt;
+    &lt;/<span class="pl-ent">u-mask</span>&gt;
+
+&lt;<span class="pl-ent">script</span>&gt;<span class="pl-s1"></span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">import</span> <span class="pl-smi">XinyuCanvasDrawer</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">"</span>@/uni_modules/xinyu-canvas-drawer/index.vue<span class="pl-pds">"</span></span>;</span>
+<span class="pl-s1">    		  <span class="pl-smi">that</span>.<span class="pl-en">rederCanvas</span>()</span>
+<span class="pl-s1">    <span class="pl-k">async</span> <span class="pl-en">rederCanvas</span>() {</span>
+<span class="pl-s1">      <span class="pl-c1">this</span>.<span class="pl-en">$nextTick</span>(<span class="pl-k">async</span> () <span class="pl-k">=&gt;</span> {</span>
+<span class="pl-s1">        <span class="pl-k">let</span> posterRef <span class="pl-k">=</span> <span class="pl-c1">this</span>.<span class="pl-smi">$refs</span>.<span class="pl-smi">poster</span>;</span>
+<span class="pl-s1">        <span class="pl-smi">uni</span>.<span class="pl-en">showLoading</span>({</span>
+<span class="pl-s1">          title<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>渲染海报中<span class="pl-pds">"</span></span>,</span>
+<span class="pl-s1">        });</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">        <span class="pl-k">let</span> organizer <span class="pl-k">=</span> <span class="pl-c1">this</span>.<span class="pl-smi">jobFairDetails</span>.<span class="pl-smi">organizer</span> <span class="pl-k">||</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>;</span>
+<span class="pl-s1">        <span class="pl-k">let</span> address <span class="pl-k">=</span> <span class="pl-c1">this</span>.<span class="pl-smi">jobFairDetails</span>.<span class="pl-smi">address</span> <span class="pl-k">||</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>;</span>
+<span class="pl-s1">		<span class="pl-k">let</span> title <span class="pl-k">=</span> <span class="pl-c1">this</span>.<span class="pl-smi">jobFairDetails</span>.<span class="pl-c1">title</span> <span class="pl-k">||</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">        <span class="pl-k">await</span> <span class="pl-smi">posterRef</span>.<span class="pl-en">init</span>();</span>
+<span class="pl-s1">        <span class="pl-k">let</span> notArr <span class="pl-k">=</span> posterRef</span>
+<span class="pl-s1">          .<span class="pl-en">setBackgroundColor</span>(<span class="pl-s"><span class="pl-pds">"</span>#F4F4F4<span class="pl-pds">"</span></span>) <span class="pl-c"><span class="pl-c">//</span>指定渲染图片的背景色</span></span>
+<span class="pl-s1">          .<span class="pl-en">addImage</span>(<span class="pl-s"><span class="pl-pds">"</span>../../../static/posterBg.png<span class="pl-pds">"</span></span>, <span class="pl-c1">0</span>, <span class="pl-c1">0</span>, <span class="pl-c1">750</span>, <span class="pl-c1">900</span>, <span class="pl-c1">false</span>)</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">          .<span class="pl-en">addImage</span>(<span class="pl-s"><span class="pl-pds">"</span>../../../static/ava.png<span class="pl-pds">"</span></span>, <span class="pl-c1">32</span>, <span class="pl-c1">48</span>, <span class="pl-c1">80</span>, <span class="pl-c1">80</span>, <span class="pl-c1">true</span>) <span class="pl-c"><span class="pl-c">//</span>绘制圆图片，如果不绘制圆图片最后一个参数可以不传或传false，当最后一个参数为true时圆形的直径为w，h参数将没有意义</span></span>
+<span class="pl-s1"></span>
+<span class="pl-s1">          .<span class="pl-en">addText</span>(title, <span class="pl-c1">180</span>, <span class="pl-c1">60</span>, <span class="pl-c1">30</span>, <span class="pl-s"><span class="pl-pds">"</span>#333<span class="pl-pds">"</span></span>, <span class="pl-c1">453</span>, <span class="pl-c1">false</span>)</span>
+<span class="pl-s1">          .<span class="pl-en">addText</span>(<span class="pl-s"><span class="pl-pds">"</span>企业认证<span class="pl-pds">"</span></span>, <span class="pl-c1">180</span>, <span class="pl-c1">100</span>, <span class="pl-c1">30</span>, <span class="pl-s"><span class="pl-pds">"</span>#666<span class="pl-pds">"</span></span>, <span class="pl-c1">453</span>, <span class="pl-c1">false</span>)</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">          .<span class="pl-en">addText</span>(<span class="pl-s"><span class="pl-pds">'</span>主办方<span class="pl-pds">'</span></span>, <span class="pl-c1">50</span>, <span class="pl-c1">200</span>, <span class="pl-c1">30</span>, <span class="pl-s"><span class="pl-pds">"</span>#666<span class="pl-pds">"</span></span>, <span class="pl-c1">453</span>, <span class="pl-c1">false</span>)</span>
+<span class="pl-s1">          .<span class="pl-en">addText</span>(organizer, <span class="pl-c1">50</span>, <span class="pl-c1">250</span>, <span class="pl-c1">40</span>, <span class="pl-s"><span class="pl-pds">"</span>#666<span class="pl-pds">"</span></span>, <span class="pl-c1">453</span>, <span class="pl-c1">false</span>)</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">          .<span class="pl-en">addText</span>(<span class="pl-s"><span class="pl-pds">"</span>地点<span class="pl-pds">"</span></span>, <span class="pl-c1">50</span>, <span class="pl-c1">650</span>, <span class="pl-c1">30</span>, <span class="pl-s"><span class="pl-pds">"</span>#333<span class="pl-pds">"</span></span>, <span class="pl-c1">453</span>, <span class="pl-c1">false</span>)</span>
+<span class="pl-s1">          .<span class="pl-en">addText</span>(address, <span class="pl-c1">50</span>, <span class="pl-c1">690</span>, <span class="pl-c1">30</span>, <span class="pl-s"><span class="pl-pds">"</span>#d87161<span class="pl-pds">"</span></span>, <span class="pl-c1">453</span>, <span class="pl-c1">false</span>)</span>
+<span class="pl-s1">          .<span class="pl-en">addText</span>(<span class="pl-s"><span class="pl-pds">"</span>参加企业<span class="pl-pds">"</span></span>, <span class="pl-c1">50</span>, <span class="pl-c1">720</span>, <span class="pl-c1">30</span>, <span class="pl-s"><span class="pl-pds">"</span>#666<span class="pl-pds">"</span></span>, <span class="pl-c1">453</span>, <span class="pl-c1">false</span>)</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">          .<span class="pl-en">addRect</span>(<span class="pl-c1">0</span>, <span class="pl-c1">900</span>, <span class="pl-c1">1000</span>, <span class="pl-c1">300</span>, <span class="pl-s"><span class="pl-pds">"</span>#FEFEFE<span class="pl-pds">"</span></span>) <span class="pl-c"><span class="pl-c">//</span>绘制矩形</span></span>
+<span class="pl-s1">          .<span class="pl-en">addText</span>(<span class="pl-s"><span class="pl-pds">"</span>西湖区就近就业<span class="pl-pds">"</span></span>, <span class="pl-c1">19</span>, <span class="pl-c1">1000</span>, <span class="pl-c1">40</span>, <span class="pl-s"><span class="pl-pds">"</span>#333<span class="pl-pds">"</span></span>, <span class="pl-c1">453</span>, <span class="pl-c1">false</span>)</span>
+<span class="pl-s1">          <span class="pl-c"><span class="pl-c">//</span> .addText("长按图片保存或分享", 19, 1058, 20, "#666", 453, false)</span></span>
+<span class="pl-s1">          .<span class="pl-en">addQRCode</span>(<span class="pl-s"><span class="pl-pds">"</span>http://www.shengxinyustudio.com<span class="pl-pds">"</span></span>, <span class="pl-c1">600</span>, <span class="pl-c1">990</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>); <span class="pl-c"><span class="pl-c">//</span>绘制二维码（不要太长否则会扫不出来）</span></span>
+<span class="pl-s1"></span>
+<span class="pl-s1">        <span class="pl-c1">this</span>.<span class="pl-smi">enterpriseList</span>.<span class="pl-c1">forEach</span>((<span class="pl-smi">item</span>, <span class="pl-smi">index</span>) <span class="pl-k">=&gt;</span> {</span>
+<span class="pl-s1">          notArr</span>
+<span class="pl-s1">            .<span class="pl-en">addRect</span>(<span class="pl-c1">50</span> <span class="pl-k">+</span> index <span class="pl-k">*</span> <span class="pl-c1">110</span>, <span class="pl-c1">760</span>, <span class="pl-c1">100</span>, <span class="pl-c1">30</span>, <span class="pl-s"><span class="pl-pds">"</span>#feefec<span class="pl-pds">"</span></span>) <span class="pl-c"><span class="pl-c">//</span>绘制矩形</span></span>
+<span class="pl-s1"></span>
+<span class="pl-s1">            .<span class="pl-en">addText</span>(</span>
+<span class="pl-s1">              <span class="pl-smi">item</span>.<span class="pl-c1">value</span>,</span>
+<span class="pl-s1">              <span class="pl-c1">80</span> <span class="pl-k">+</span> index <span class="pl-k">*</span> <span class="pl-c1">100</span>,</span>
+<span class="pl-s1">              <span class="pl-c1">765</span>,</span>
+<span class="pl-s1">              <span class="pl-c1">20</span>,</span>
+<span class="pl-s1">              <span class="pl-s"><span class="pl-pds">"</span>#d87161<span class="pl-pds">"</span></span>,</span>
+<span class="pl-s1">              <span class="pl-c1">453</span>,</span>
+<span class="pl-s1">              <span class="pl-c1">false</span></span>
+<span class="pl-s1">            );</span>
+<span class="pl-s1">        });</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">        <span class="pl-c1">this</span>.<span class="pl-smi">src</span> <span class="pl-k">=</span> <span class="pl-k">await</span> <span class="pl-smi">notArr</span>.<span class="pl-en">draw</span>();</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">        <span class="pl-c1">this</span>.<span class="pl-smi">isCanvasLoading</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;</span>
+<span class="pl-s1">        <span class="pl-smi">uni</span>.<span class="pl-en">hideLoading</span>();</span>
+<span class="pl-s1">        <span class="pl-c1">this</span>.<span class="pl-en">$forceUpdate</span>();</span>
+<span class="pl-s1">      });</span>
+<span class="pl-s1">    },</span>
+<span class="pl-s1">    </span>&lt;/<span class="pl-ent">script</span>&gt;
+</pre></div>
+<h3>14.html2canvas 页面转图片</h3>
+<div class="highlight highlight-source-vue"><pre class="notranslate">&lt;<span class="pl-ent">script</span>&gt;<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-en">generateImage</span>() {</span>
+<span class="pl-s1">      <span class="pl-k">const</span> <span class="pl-c1">element</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">"</span>target-element<span class="pl-pds">"</span></span>); <span class="pl-c"><span class="pl-c">//</span> 替换为目标元素的id或class</span></span>
+<span class="pl-s1">      <span class="pl-en">html2canvas</span>(element).<span class="pl-c1">then</span>(<span class="pl-smi">canvas</span> <span class="pl-k">=&gt;</span> {</span>
+<span class="pl-s1">        <span class="pl-k">const</span> <span class="pl-c1">image</span> <span class="pl-k">=</span> <span class="pl-smi">canvas</span>.<span class="pl-c1">toDataURL</span>(<span class="pl-s"><span class="pl-pds">"</span>image/png<span class="pl-pds">"</span></span>);</span>
+<span class="pl-s1">        <span class="pl-k">const</span> <span class="pl-c1">link</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">createElement</span>(<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>);</span>
+<span class="pl-s1">        <span class="pl-smi">link</span>.<span class="pl-c1">href</span> <span class="pl-k">=</span> image;</span>
+<span class="pl-s1">        <span class="pl-smi">link</span>.<span class="pl-smi">download</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>image.png<span class="pl-pds">"</span></span>;</span>
+<span class="pl-s1">        <span class="pl-smi">link</span>.<span class="pl-c1">click</span>();</span>
+<span class="pl-s1">      });</span>
+<span class="pl-s1">    },</span>
+<span class="pl-s1"></span>&lt;/<span class="pl-ent">script</span>&gt;   
+</pre></div>
+<h3>15.Object.assign同名属性的替换</h3>
+<p>对于这种嵌套的对象，一旦遇到同名属性，**<code class="notranslate">Object.assign</code>**的处理方法是替换，而不是添加。</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">const</span> <span class="pl-s1">target</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span> <span class="pl-c1">a</span>: <span class="pl-kos">{</span> <span class="pl-c1">b</span>: <span class="pl-s">'c'</span><span class="pl-kos">,</span> <span class="pl-c1">d</span>: <span class="pl-s">'e'</span> <span class="pl-kos">}</span> <span class="pl-kos">}</span>
+<span class="pl-k">const</span> <span class="pl-s1">source</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span> <span class="pl-c1">a</span>: <span class="pl-kos">{</span> <span class="pl-c1">b</span>: <span class="pl-s">'hello'</span> <span class="pl-kos">}</span> <span class="pl-kos">}</span>
+<span class="pl-v">Object</span><span class="pl-kos">.</span><span class="pl-en">assign</span><span class="pl-kos">(</span><span class="pl-s1">target</span><span class="pl-kos">,</span> <span class="pl-s1">source</span><span class="pl-kos">)</span><span class="pl-c">// { a: { b: 'hello' } </span></pre></div>
+<h3>16. 手写深拷贝</h3>
+<p><a href="https://blog.csdn.net/iaz999/article/details/130968237" rel="nofollow">手写浅拷贝和深拷贝</a></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">export</span> <span class="pl-k">function</span> <span class="pl-en">cloneDeep</span><span class="pl-kos">(</span><span class="pl-s1">obj</span><span class="pl-kos">,</span> <span class="pl-s1">map</span> <span class="pl-c1">=</span> <span class="pl-k">new</span> <span class="pl-v">WeakMap</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+
+    <span class="pl-c">// 获取更详细的数据类型</span>
+    <span class="pl-k">function</span> <span class="pl-en">getType</span><span class="pl-kos">(</span><span class="pl-s1">obj</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-k">return</span> <span class="pl-v">Object</span><span class="pl-kos">.</span><span class="pl-c1">prototype</span><span class="pl-kos">.</span><span class="pl-c1">toString</span><span class="pl-kos">.</span><span class="pl-en">call</span><span class="pl-kos">(</span><span class="pl-s1">obj</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span>
+
+    <span class="pl-c">// 处理普通函数和箭头函数</span>
+    <span class="pl-k">function</span> <span class="pl-en">cloneFunction</span><span class="pl-kos">(</span><span class="pl-s1">func</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-k">const</span> <span class="pl-s1">bodyReg</span> <span class="pl-c1">=</span> <span class="pl-pds"><span class="pl-c1">/</span><span class="pl-kos">(?&lt;</span><span class="pl-c1">=</span><span class="pl-s">{</span><span class="pl-kos">)</span><span class="pl-kos">(</span>.<span class="pl-c1">|</span><span class="pl-cce">\n</span><span class="pl-kos">)</span><span class="pl-c1">+</span><span class="pl-kos">(?</span><span class="pl-c1">=</span><span class="pl-s">}</span><span class="pl-kos">)</span><span class="pl-c1">/</span>m</span><span class="pl-kos">;</span>
+        <span class="pl-k">const</span> <span class="pl-s1">paramReg</span> <span class="pl-c1">=</span> <span class="pl-pds"><span class="pl-c1">/</span><span class="pl-kos">(?&lt;</span><span class="pl-c1">=</span><span class="pl-cce">\(</span><span class="pl-kos">)</span>.<span class="pl-c1">+</span><span class="pl-kos">(?</span><span class="pl-c1">=</span><span class="pl-cce">\)</span><span class="pl-cce">\s</span><span class="pl-c1">+</span><span class="pl-s">{</span><span class="pl-kos">)</span><span class="pl-c1">/</span></span><span class="pl-kos">;</span>
+        <span class="pl-k">const</span> <span class="pl-s1">funcString</span> <span class="pl-c1">=</span> <span class="pl-s1">func</span><span class="pl-kos">.</span><span class="pl-en">toString</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">func</span><span class="pl-kos">.</span><span class="pl-c1">prototype</span><span class="pl-kos">)</span> <span class="pl-kos">{</span> <span class="pl-c">//箭头函数是没有prototype的</span>
+            <span class="pl-smi">console</span><span class="pl-kos">.</span><span class="pl-en">log</span><span class="pl-kos">(</span><span class="pl-s">'普通函数'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+            <span class="pl-k">const</span> <span class="pl-s1">param</span> <span class="pl-c1">=</span> <span class="pl-s1">paramReg</span><span class="pl-kos">.</span><span class="pl-en">exec</span><span class="pl-kos">(</span><span class="pl-s1">funcString</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+            <span class="pl-k">const</span> <span class="pl-s1">body</span> <span class="pl-c1">=</span> <span class="pl-s1">bodyReg</span><span class="pl-kos">.</span><span class="pl-en">exec</span><span class="pl-kos">(</span><span class="pl-s1">funcString</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+            <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">body</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+                <span class="pl-smi">console</span><span class="pl-kos">.</span><span class="pl-en">log</span><span class="pl-kos">(</span><span class="pl-s">'匹配到函数体：'</span><span class="pl-kos">,</span> <span class="pl-s1">body</span><span class="pl-kos">[</span><span class="pl-c1">0</span><span class="pl-kos">]</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+                <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">param</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+                    <span class="pl-k">const</span> <span class="pl-s1">paramArr</span> <span class="pl-c1">=</span> <span class="pl-s1">param</span><span class="pl-kos">[</span><span class="pl-c1">0</span><span class="pl-kos">]</span><span class="pl-kos">.</span><span class="pl-en">split</span><span class="pl-kos">(</span><span class="pl-s">','</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+                    <span class="pl-smi">console</span><span class="pl-kos">.</span><span class="pl-en">log</span><span class="pl-kos">(</span><span class="pl-s">'匹配到参数：'</span><span class="pl-kos">,</span> <span class="pl-s1">paramArr</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+                    <span class="pl-k">return</span> <span class="pl-k">new</span> <span class="pl-v">Function</span><span class="pl-kos">(</span>...<span class="pl-s1">paramArr</span><span class="pl-kos">,</span> <span class="pl-s1">body</span><span class="pl-kos">[</span><span class="pl-c1">0</span><span class="pl-kos">]</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+                <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-kos">{</span>
+                    <span class="pl-k">return</span> <span class="pl-k">new</span> <span class="pl-v">Function</span><span class="pl-kos">(</span><span class="pl-s1">body</span><span class="pl-kos">[</span><span class="pl-c1">0</span><span class="pl-kos">]</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+                <span class="pl-kos">}</span>
+            <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-kos">{</span>
+                <span class="pl-k">return</span> <span class="pl-c1">null</span><span class="pl-kos">;</span>
+            <span class="pl-kos">}</span>
+        <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-kos">{</span>
+            <span class="pl-k">return</span> <span class="pl-en">eval</span><span class="pl-kos">(</span><span class="pl-s1">funcString</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-kos">}</span>
+    <span class="pl-kos">}</span>
+
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">obj</span> <span class="pl-c1">===</span> <span class="pl-c1">null</span> <span class="pl-c1">||</span> <span class="pl-s1">obj</span> <span class="pl-c1">===</span> <span class="pl-c1">undefined</span><span class="pl-kos">)</span> <span class="pl-k">return</span> <span class="pl-s1">obj</span> <span class="pl-c">//不进行拷贝</span>
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">obj</span> <span class="pl-k">instanceof</span> <span class="pl-v">Date</span><span class="pl-kos">)</span> <span class="pl-k">return</span> <span class="pl-k">new</span> <span class="pl-v">Date</span><span class="pl-kos">(</span><span class="pl-s1">obj</span><span class="pl-kos">)</span>
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">obj</span> <span class="pl-k">instanceof</span> <span class="pl-v">RegExp</span><span class="pl-kos">)</span> <span class="pl-k">return</span> <span class="pl-k">new</span> <span class="pl-v">RegExp</span><span class="pl-kos">(</span><span class="pl-s1">obj</span><span class="pl-kos">)</span>
+    <span class="pl-c">// 原始类型</span>
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-k">typeof</span> <span class="pl-s1">obj</span> <span class="pl-c1">!==</span> <span class="pl-s">'object'</span> <span class="pl-c1">&amp;&amp;</span> <span class="pl-k">typeof</span> <span class="pl-s1">obj</span> <span class="pl-c1">!==</span> <span class="pl-s">'function'</span><span class="pl-kos">)</span> <span class="pl-k">return</span> <span class="pl-s1">obj</span>
+    <span class="pl-c">// 处理普通函数和箭头函数</span>
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-k">typeof</span> <span class="pl-s1">obj</span> <span class="pl-c1">===</span> <span class="pl-s">'function'</span><span class="pl-kos">)</span> <span class="pl-k">return</span> <span class="pl-en">cloneFunction</span><span class="pl-kos">(</span><span class="pl-s1">obj</span><span class="pl-kos">)</span>
+    <span class="pl-c">// 是对象就进行深拷贝</span>
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">map</span><span class="pl-kos">.</span><span class="pl-en">get</span><span class="pl-kos">(</span><span class="pl-s1">obj</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-k">return</span> <span class="pl-s1">map</span><span class="pl-kos">.</span><span class="pl-en">get</span><span class="pl-kos">(</span><span class="pl-s1">obj</span><span class="pl-kos">)</span>
+    <span class="pl-k">let</span> <span class="pl-s1">cloneObj</span> <span class="pl-c1">=</span> <span class="pl-k">new</span> <span class="pl-s1">obj</span><span class="pl-kos">.</span><span class="pl-c1">constructor</span><span class="pl-kos">(</span><span class="pl-kos">)</span>
+    <span class="pl-s1">map</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s1">obj</span><span class="pl-kos">,</span> <span class="pl-s1">cloneObj</span><span class="pl-kos">)</span>
+
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-en">getType</span><span class="pl-kos">(</span><span class="pl-s1">obj</span><span class="pl-kos">)</span> <span class="pl-c1">===</span> <span class="pl-s">'[object Map]'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-s1">obj</span><span class="pl-kos">.</span><span class="pl-en">forEach</span><span class="pl-kos">(</span><span class="pl-kos">(</span><span class="pl-s1">item</span><span class="pl-kos">,</span> <span class="pl-s1">key</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-kos">{</span>
+            <span class="pl-s1">cloneObj</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-en">cloneDeep</span><span class="pl-kos">(</span><span class="pl-s1">key</span><span class="pl-kos">,</span> <span class="pl-s1">map</span><span class="pl-kos">)</span><span class="pl-kos">,</span> <span class="pl-en">cloneDeep</span><span class="pl-kos">(</span><span class="pl-s1">item</span><span class="pl-kos">,</span> <span class="pl-s1">map</span><span class="pl-kos">)</span><span class="pl-kos">)</span>
+        <span class="pl-kos">}</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span>
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-en">getType</span><span class="pl-kos">(</span><span class="pl-s1">obj</span><span class="pl-kos">)</span> <span class="pl-c1">===</span> <span class="pl-s">'[object Set]'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-s1">obj</span><span class="pl-kos">.</span><span class="pl-en">forEach</span><span class="pl-kos">(</span><span class="pl-s1">item</span> <span class="pl-c1">=&gt;</span> <span class="pl-kos">{</span>
+            <span class="pl-s1">cloneObj</span><span class="pl-kos">.</span><span class="pl-en">add</span><span class="pl-kos">(</span><span class="pl-en">cloneDeep</span><span class="pl-kos">(</span><span class="pl-s1">item</span><span class="pl-kos">,</span> <span class="pl-s1">map</span><span class="pl-kos">)</span><span class="pl-kos">)</span>
+        <span class="pl-kos">}</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span>
+    <span class="pl-k">for</span> <span class="pl-kos">(</span><span class="pl-k">let</span> <span class="pl-s1">key</span> <span class="pl-k">of</span> <span class="pl-v">Object</span><span class="pl-kos">.</span><span class="pl-en">keys</span><span class="pl-kos">(</span><span class="pl-s1">obj</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-s1">cloneObj</span><span class="pl-kos">[</span><span class="pl-s1">key</span><span class="pl-kos">]</span> <span class="pl-c1">=</span> <span class="pl-en">cloneDeep</span><span class="pl-kos">(</span><span class="pl-s1">obj</span><span class="pl-kos">[</span><span class="pl-s1">key</span><span class="pl-kos">]</span><span class="pl-kos">,</span> <span class="pl-s1">map</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span>
+    <span class="pl-k">return</span> <span class="pl-s1">cloneObj</span>
+<span class="pl-kos">}</span>
+</pre></div>
+<h3>17. 横向滚动</h3>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate">    <span class="pl-kos">&lt;</span><span class="pl-ent">style</span><span class="pl-kos">&gt;</span>
+        .<span class="pl-c1">tab</span> {
+            <span class="pl-c1">width</span><span class="pl-kos">:</span> <span class="pl-c1">100<span class="pl-smi">px</span></span>;
+            <span class="pl-c1">height</span><span class="pl-kos">:</span> <span class="pl-c1">30<span class="pl-smi">px</span></span>;
+            <span class="pl-c1">line-height</span><span class="pl-kos">:</span> <span class="pl-c1">30<span class="pl-smi">px</span></span>;
+            <span class="pl-c1">border</span><span class="pl-kos">:</span> <span class="pl-c1">1<span class="pl-smi">px</span></span> solid <span class="pl-pds"><span class="pl-kos">#</span>000</span>;
+            <span class="pl-c1">overflow</span><span class="pl-kos">:</span> hidden;
+
+            <span class="pl-c1">padding</span><span class="pl-kos">:</span> <span class="pl-c1">20<span class="pl-smi">px</span></span>;
+        }
+
+        .<span class="pl-c1">tip</span> {
+            <span class="pl-c1">width</span><span class="pl-kos">:</span> <span class="pl-c1">200<span class="pl-smi">px</span></span>;
+            <span class="pl-c1">animation</span><span class="pl-kos">:</span> fadenum <span class="pl-c1">4<span class="pl-smi">s</span></span> linear  infinite;
+        }
+
+        <span class="pl-k">@keyframes</span> fadenum {
+            <span class="pl-c1">0<span class="pl-smi">%</span></span> {
+                <span class="pl-c1">transform</span><span class="pl-kos">:</span> <span class="pl-en">translateX</span>(<span class="pl-c1">0</span>);
+            }
+
+            <span class="pl-c1">100<span class="pl-smi">%</span></span> {
+                <span class="pl-c1">transform</span><span class="pl-kos">:</span> <span class="pl-en">translateX</span>(<span class="pl-c1">-110<span class="pl-smi">px</span></span>);
+            }
+        }
+    <span class="pl-kos">&lt;/</span><span class="pl-ent">style</span><span class="pl-kos">&gt;</span>
+
+    <span class="pl-kos">&lt;</span><span class="pl-ent">div</span> <span class="pl-c1">class</span>="<span class="pl-s">tab</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">div</span> <span class="pl-c1">class</span>="<span class="pl-s">tip</span>"<span class="pl-kos">&gt;</span>人力资源服务机构/零工中介<span class="pl-kos">&lt;/</span><span class="pl-ent">div</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;/</span><span class="pl-ent">div</span><span class="pl-kos">&gt;</span></pre></div>
+<h3>18. 表格滚动</h3>
+<div class="highlight highlight-source-vue"><pre class="notranslate">&lt;<span class="pl-ent">el-table</span>  ref="tableRef1"&gt;&lt;/<span class="pl-ent">el-table</span>&gt;
+&lt;<span class="pl-ent">script</span> setup&gt;<span class="pl-s1"> </span>
+<span class="pl-s1">    <span class="pl-c"><span class="pl-c">//</span> 重置滚动高度</span></span>
+<span class="pl-s1">    <span class="pl-k">if</span> (<span class="pl-smi">tableRef1</span>.<span class="pl-c1">value</span>) {</span>
+<span class="pl-s1">        <span class="pl-smi">tableRef1</span>.<span class="pl-c1">value</span>.<span class="pl-smi">$refs</span>.<span class="pl-smi">bodyWrapper</span>.<span class="pl-c1">getElementsByClassName</span>(<span class="pl-s"><span class="pl-pds">"</span>el-scrollbar__wrap<span class="pl-pds">"</span></span>)[<span class="pl-c1">0</span>].<span class="pl-smi">scrollTop</span> <span class="pl-k">=</span> <span class="pl-c1">0</span></span>
+<span class="pl-s1">    }</span>
+<span class="pl-s1">    <span class="pl-en">nextTick</span>(() <span class="pl-k">=&gt;</span> {</span>
+<span class="pl-s1">        <span class="pl-en">scroll</span>(<span class="pl-smi">tableRef1</span>.<span class="pl-c1">value</span>.<span class="pl-smi">$refs</span>.<span class="pl-smi">bodyWrapper</span>);</span>
+<span class="pl-s1">    });</span>
+<span class="pl-s1"></span>&lt;/<span class="pl-ent">script</span>&gt;</pre></div>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// 表格滚动</span>
+<span class="pl-k">export</span> <span class="pl-k">const</span> <span class="pl-en">scroll</span> <span class="pl-c1">=</span> <span class="pl-kos">(</span><span class="pl-s1">tableBody</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-kos">{</span>
+    <span class="pl-k">let</span> <span class="pl-s1">isScroll</span> <span class="pl-c1">=</span> <span class="pl-c1">true</span><span class="pl-kos">;</span> <span class="pl-c">//滚动</span>
+    <span class="pl-k">const</span> <span class="pl-s1">tableDom</span> <span class="pl-c1">=</span> <span class="pl-s1">tableBody</span><span class="pl-kos">.</span><span class="pl-en">getElementsByClassName</span><span class="pl-kos">(</span><span class="pl-s">"el-scrollbar__wrap"</span><span class="pl-kos">)</span><span class="pl-kos">[</span><span class="pl-c1">0</span><span class="pl-kos">]</span><span class="pl-kos">;</span>
+    <span class="pl-c">// console.log("tableDom: ", tableDom);</span>
+
+    <span class="pl-c">//鼠标放上去，停止滚动；移开，继续滚动</span>
+    <span class="pl-s1">tableDom</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">"mouseover"</span><span class="pl-kos">,</span> <span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-kos">{</span>
+      <span class="pl-s1">isScroll</span> <span class="pl-c1">=</span> <span class="pl-c1">false</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-s1">tableDom</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">"mouseout"</span><span class="pl-kos">,</span> <span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-kos">{</span>
+      <span class="pl-s1">isScroll</span> <span class="pl-c1">=</span> <span class="pl-c1">true</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+
+    <span class="pl-en">setInterval</span><span class="pl-kos">(</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-kos">{</span>
+        <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">isScroll</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+          <span class="pl-s1">tableDom</span><span class="pl-kos">.</span><span class="pl-c1">scrollTop</span> <span class="pl-c1">+=</span> <span class="pl-c1">1</span><span class="pl-kos">;</span> <span class="pl-c">//设置滚动速度</span>
+          <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">tableDom</span><span class="pl-kos">.</span><span class="pl-c1">clientHeight</span> <span class="pl-c1">+</span> <span class="pl-s1">tableDom</span><span class="pl-kos">.</span><span class="pl-c1">scrollTop</span> <span class="pl-c1">&gt;=</span> <span class="pl-s1">tableDom</span><span class="pl-kos">.</span><span class="pl-c1">scrollHeight</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+            <span class="pl-s1">tableDom</span><span class="pl-kos">.</span><span class="pl-c1">scrollTop</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">;</span>
+          <span class="pl-kos">}</span>
+        <span class="pl-kos">}</span>
+      <span class="pl-kos">}</span><span class="pl-kos">,</span> <span class="pl-c1">50</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-kos">}</span><span class="pl-kos">;</span></pre></div>
+<h3>19. 浙里办打开高德导航软件</h3>
+<div class="highlight highlight-source-vue"><pre class="notranslate">          if (this.OS == 'android') {
+						ZWJSBridge.openLink({
+							"url": `androidamap://viewMap?sourceApplication=appname&amp;poiname=${address}&amp;lat=${latitude}&amp;lon=${longitude}&amp;dev=0`
+						}).then(res =&gt; {
+							console.log('成功', res)
+						}).catch(err =&gt; {
+							console.log('失败', err)
+						})
+						setTimeout(() =&gt; {
+							if (this.jump) {
+
+								ZWJSBridge.openLink({
+									"url": `https://uri.amap.com/marker?position=${longitude},${latitude}&amp;name=${address}`
+								}).then(res =&gt; {
+									console.log('成功', res)
+								}).catch(err =&gt; {
+									console.log('失败', err)
+								})
+              }
+						}, 2000)
+					}
+					if (this.OS == 'ios') {
+
+						// ZWJSBridge.openLink({
+						// 	"url": `iosamap://viewMap?sourceApplication=applicationName&amp;poiname=${address}&amp;lat=${longitude}&amp;lon=${latitude}&amp;dev=0`
+						// }).then(res =&gt; {  
+						// 	console.log('成功', res)
+						// }).catch(err =&gt; {
+						// 	console.log('失败', err)
+						// })
+						// setTimeout(() =&gt; {
+						// 	if (this.jump) {
+
+
+            //   }
+						// }, 2000)
+            //callnative是否尝试调起高德地图APP并在APP中查看，0表示不调起，1表示调起, 默认值为0
+            	ZWJSBridge.openLink({
+									"url": `https://uri.amap.com/marker?position=${longitude},${latitude}&amp;name=${address}&amp;callnative=1`
+								}).then(res =&gt; { 
+									console.log('成功', res) 
+								}).catch(err =&gt; {
+									console.log('失败', err)
+								})
+
+					}</pre></div>
+<h3>20. 查看属性在对象的层级</h3>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">function</span> <span class="pl-en">findPropertyLevel</span><span class="pl-kos">(</span><span class="pl-s1">obj</span><span class="pl-kos">,</span> <span class="pl-s1">property</span><span class="pl-kos">,</span> <span class="pl-s1">currentLevel</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-k">for</span> <span class="pl-kos">(</span><span class="pl-k">let</span> <span class="pl-s1">key</span> <span class="pl-k">in</span> <span class="pl-s1">obj</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">key</span> <span class="pl-c1">===</span> <span class="pl-s1">property</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-k">return</span> <span class="pl-s1">currentLevel</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span>
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-k">typeof</span> <span class="pl-s1">obj</span><span class="pl-kos">[</span><span class="pl-s1">key</span><span class="pl-kos">]</span> <span class="pl-c1">===</span> <span class="pl-s">'object'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-k">const</span> <span class="pl-s1">level</span> <span class="pl-c1">=</span> <span class="pl-en">findPropertyLevel</span><span class="pl-kos">(</span><span class="pl-s1">obj</span><span class="pl-kos">[</span><span class="pl-s1">key</span><span class="pl-kos">]</span><span class="pl-kos">,</span> <span class="pl-s1">property</span><span class="pl-kos">,</span> <span class="pl-s1">currentLevel</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+      <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">level</span> <span class="pl-c1">!==</span> <span class="pl-c1">-</span><span class="pl-c1">1</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-k">return</span> <span class="pl-s1">level</span><span class="pl-kos">;</span>
+      <span class="pl-kos">}</span>
+    <span class="pl-kos">}</span>
+  <span class="pl-kos">}</span>
+  <span class="pl-k">return</span> <span class="pl-c1">-</span><span class="pl-c1">1</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span></pre></div>
+<h3>21. window.open和location.href</h3>
+<p><a target="_blank" rel="noopener noreferrer" href=""><img alt="b5082288b1f729ce2fa7c3e7bd015b1" style="max-width: 100%;"></a></p>
+<h3>22. 清除定时器</h3>
+<p>在uniapp或者vue里面 使用this.timeId 赋值的定时器id 可能清除不掉 可以直接 var timeId  这种定义的来 clear清除</p>
+<h3>23. 数组按照指定顺序排序</h3>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-en">sortArray</span><span class="pl-kos">(</span><span class="pl-s1">arr</span><span class="pl-kos">,</span> <span class="pl-s1">order</span><span class="pl-kos">)</span><span class="pl-kos"></span> <span class="pl-kos">{</span>
+    <span class="pl-k">return</span> <span class="pl-s1">arr</span><span class="pl-kos">.</span><span class="pl-en">sort</span><span class="pl-kos">(</span><span class="pl-kos">(</span><span class="pl-s1">a</span><span class="pl-kos">,</span> <span class="pl-s1">b</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-kos">{</span>
+        <span class="pl-k">const</span> <span class="pl-s1">aIndex</span> <span class="pl-c1">=</span> <span class="pl-s1">order</span><span class="pl-kos">.</span><span class="pl-en">indexOf</span><span class="pl-kos">(</span><span class="pl-s1">a</span><span class="pl-kos">.</span><span class="pl-c1">value</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-k">const</span> <span class="pl-s1">bIndex</span> <span class="pl-c1">=</span> <span class="pl-s1">order</span><span class="pl-kos">.</span><span class="pl-en">indexOf</span><span class="pl-kos">(</span><span class="pl-s1">b</span><span class="pl-kos">.</span><span class="pl-c1">value</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-k">return</span> <span class="pl-s1">aIndex</span> <span class="pl-c1">-</span> <span class="pl-s1">bIndex</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span>
+<span class="pl-k">const</span> <span class="pl-s1">order</span> <span class="pl-c1">=</span> <span class="pl-kos">[</span><span class="pl-s">'进行中'</span><span class="pl-kos">,</span> <span class="pl-s">'待开始'</span><span class="pl-kos">,</span> <span class="pl-s">'已结束'</span><span class="pl-kos">]</span><span class="pl-kos">;</span>
+
+<span class="pl-s1">that</span><span class="pl-kos">.</span><span class="pl-c1">list2</span> <span class="pl-c1">=</span> <span class="pl-s1">that</span><span class="pl-kos">.</span><span class="pl-en">sortArray</span><span class="pl-kos">(</span><span class="pl-s1">that</span><span class="pl-kos">.</span><span class="pl-c1">list2</span><span class="pl-kos">,</span> <span class="pl-s1">order</span><span class="pl-kos">)</span> </pre></div>
+<h4>24. vue全局挂载组件并使用指令控制组件行为</h4>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">const</span> <span class="pl-v">Toast</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
+  <span class="pl-en">install</span><span class="pl-kos">(</span><span class="pl-v">Vue</span><span class="pl-kos">,</span> <span class="pl-s1">options</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-c">// 创建一个Toast的Vue实例</span>
+    <span class="pl-k">const</span> <span class="pl-v">ToastConstructor</span> <span class="pl-c1">=</span> <span class="pl-v">Vue</span><span class="pl-kos">.</span><span class="pl-en">extend</span><span class="pl-kos">(</span><span class="pl-s1">cellWrapper</span><span class="pl-kos">)</span>
+    <span class="pl-k">let</span> <span class="pl-s1">instance</span>
+    <span class="pl-c">// 在Vue的原型上添加一个全局方法</span>
+    <span class="pl-v">Vue</span><span class="pl-kos">.</span><span class="pl-c1">prototype</span><span class="pl-kos">.</span><span class="pl-en">$toast</span> <span class="pl-c1">=</span> <span class="pl-kos">(</span><span class="pl-s1">message</span><span class="pl-kos">,</span> <span class="pl-s1">duration</span> <span class="pl-c1">=</span> <span class="pl-c1">3000</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-kos">{</span>
+      <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-c1">!</span><span class="pl-s1">instance</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-s1">instance</span> <span class="pl-c1">=</span> <span class="pl-k">new</span> <span class="pl-v">ToastConstructor</span><span class="pl-kos">(</span><span class="pl-kos">{</span>
+          <span class="pl-c1">el</span>: <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'div'</span><span class="pl-kos">)</span><span class="pl-kos">,</span>
+          <span class="pl-en">data</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+            <span class="pl-k">return</span> <span class="pl-kos">{</span>
+              <span class="pl-c1">message</span>: <span class="pl-s1">message</span><span class="pl-kos">,</span>
+              <span class="pl-c1">isShow</span>: <span class="pl-c1">true</span>
+            <span class="pl-kos">}</span>
+          <span class="pl-kos">}</span>
+        <span class="pl-kos">}</span><span class="pl-kos">)</span>
+        <span class="pl-c">// 将实例挂载到body上</span>
+        <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-c1">body</span><span class="pl-kos">.</span><span class="pl-en">appendChild</span><span class="pl-kos">(</span><span class="pl-s1">instance</span><span class="pl-kos">.</span><span class="pl-c1">$el</span><span class="pl-kos">)</span>
+      <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-kos">{</span>
+        <span class="pl-s1">instance</span><span class="pl-kos">.</span><span class="pl-c1">message</span> <span class="pl-c1">=</span> <span class="pl-s1">message</span>
+        <span class="pl-s1">instance</span><span class="pl-kos">.</span><span class="pl-c1">isShow</span> <span class="pl-c1">=</span> <span class="pl-c1">true</span>
+      <span class="pl-kos">}</span>
+      <span class="pl-c">// 设置延时隐藏</span>
+      <span class="pl-en">setTimeout</span><span class="pl-kos">(</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-kos">{</span>
+        <span class="pl-s1">instance</span><span class="pl-kos">.</span><span class="pl-c1">isShow</span> <span class="pl-c1">=</span> <span class="pl-c1">false</span>
+      <span class="pl-kos">}</span><span class="pl-kos">,</span> <span class="pl-s1">duration</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span>
+  <span class="pl-kos">}</span>
+<span class="pl-kos">}</span>
+
+<span class="pl-v">Vue</span><span class="pl-kos">.</span><span class="pl-en">use</span><span class="pl-kos">(</span><span class="pl-v">Toast</span><span class="pl-kos">)</span></pre></div>
+<h3>24. nuxt使用hash路由</h3>
+<pre class="notranslate"><code class="notranslate">defineNuxtConfig
+
+  router: {
+    options:{
+      hashMode: true,
+    }
+  },
+</code></pre>
+<h3>25. 智能JSON解析</h3>
+<div class="highlight highlight-source-js"><pre class="notranslate">    <span class="pl-c">/**</span>
+<span class="pl-c">     * 智能JSON解析方法</span>
+<span class="pl-c">     * <span class="pl-k">@param</span> {<span class="pl-smi">any</span>} data - 需要解析的数据</span>
+<span class="pl-c">     * <span class="pl-k">@returns</span> {<span class="pl-smi">any</span>} 解析后的数据</span>
+<span class="pl-c">     */</span>
+    <span class="pl-en">safeJsonParse</span><span class="pl-kos">(</span><span class="pl-s1">data</span><span class="pl-kos">)</span><span class="pl-kos"></span> <span class="pl-kos">{</span>
+      <span class="pl-c">// 如果不是字符串，直接返回</span>
+      <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-k">typeof</span> <span class="pl-s1">data</span> <span class="pl-c1">!==</span> <span class="pl-s">'string'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-k">return</span> <span class="pl-s1">data</span>
+      <span class="pl-kos">}</span>
+      
+      <span class="pl-c">// 如果是空字符串，返回null</span>
+      <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-c1">!</span><span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">trim</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-k">return</span> <span class="pl-c1">null</span>
+      <span class="pl-kos">}</span>
+      
+      <span class="pl-k">try</span> <span class="pl-kos">{</span>
+        <span class="pl-k">const</span> <span class="pl-s1">parsed</span> <span class="pl-c1">=</span> <span class="pl-c1">JSON</span><span class="pl-kos">.</span><span class="pl-en">parse</span><span class="pl-kos">(</span><span class="pl-s1">data</span><span class="pl-kos">)</span>
+        
+        <span class="pl-c">// 如果解析结果是数组，需要递归检查数组中的每个元素</span>
+        <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-v">Array</span><span class="pl-kos">.</span><span class="pl-en">isArray</span><span class="pl-kos">(</span><span class="pl-s1">parsed</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+          <span class="pl-k">return</span> <span class="pl-s1">parsed</span><span class="pl-kos">.</span><span class="pl-en">map</span><span class="pl-kos">(</span><span class="pl-s1">item</span> <span class="pl-c1">=&gt;</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">safeJsonParse</span><span class="pl-kos">(</span><span class="pl-s1">item</span><span class="pl-kos">)</span><span class="pl-kos">)</span>
+        <span class="pl-kos">}</span>
+        
+        <span class="pl-c">// 如果解析结果是对象，需要递归检查对象中的每个值</span>
+        <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">parsed</span> <span class="pl-c1">&amp;&amp;</span> <span class="pl-k">typeof</span> <span class="pl-s1">parsed</span> <span class="pl-c1">===</span> <span class="pl-s">'object'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+          <span class="pl-k">const</span> <span class="pl-s1">result</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span><span class="pl-kos">}</span>
+          <span class="pl-k">for</span> <span class="pl-kos">(</span><span class="pl-k">const</span> <span class="pl-s1">key</span> <span class="pl-k">in</span> <span class="pl-s1">parsed</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+            <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">parsed</span><span class="pl-kos">.</span><span class="pl-en">hasOwnProperty</span><span class="pl-kos">(</span><span class="pl-s1">key</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+              <span class="pl-s1">result</span><span class="pl-kos">[</span><span class="pl-s1">key</span><span class="pl-kos">]</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">safeJsonParse</span><span class="pl-kos">(</span><span class="pl-s1">parsed</span><span class="pl-kos">[</span><span class="pl-s1">key</span><span class="pl-kos">]</span><span class="pl-kos">)</span>
+            <span class="pl-kos">}</span>
+          <span class="pl-kos">}</span>
+          <span class="pl-k">return</span> <span class="pl-s1">result</span>
+        <span class="pl-kos">}</span>
+        
+        <span class="pl-c">// 其他情况直接返回解析结果</span>
+        <span class="pl-k">return</span> <span class="pl-s1">parsed</span>
+      <span class="pl-kos">}</span> <span class="pl-k">catch</span> <span class="pl-kos">(</span><span class="pl-s1">error</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-c">// 解析失败，返回原始数据</span>
+        <span class="pl-smi">console</span><span class="pl-kos">.</span><span class="pl-en">warn</span><span class="pl-kos">(</span><span class="pl-s">'JSON解析失败，返回原始数据:'</span><span class="pl-kos">,</span> <span class="pl-s1">data</span><span class="pl-kos">)</span>
+        <span class="pl-k">return</span> <span class="pl-s1">data</span>
+      <span class="pl-kos">}</span>
+    <span class="pl-kos">}</span><span class="pl-kos">,</span></pre></div></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://holding-one.github.io/blog">Blog Title</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","holding-one/blog");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+
+
+</html>
