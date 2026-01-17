@@ -865,7 +865,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <h3>4.单行溢出隐藏</h3>
 <p>英文溢出不会...</p>
 <p>小程序要用text标签</p>
-<div class="highlight highlight-source-vue"><pre class="notranslate">    display: -webkit-box; /*弹性伸缩盒子模型显示*/
+<div class="highlight highlight-text-html-vue"><pre class="notranslate">    display: -webkit-box; /*弹性伸缩盒子模型显示*/
     -webkit-box-orient: vertical; /*排列方式*/
     -webkit-line-clamp: 1; /*显示文本行数(这里控制多少行隐藏)*/
     overflow: hidden; /*溢出隐藏*/</pre></div>
@@ -941,7 +941,7 @@ div {
 <h3>9.生成二维码</h3>
 <p><a href="https://blog.csdn.net/weixin_42601136/article/details/114839489" rel="nofollow">教程</a></p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">npm install vue-qr --save</pre></div>
-<div class="highlight highlight-source-vue"><pre class="notranslate">      &lt;<span class="pl-ent">vue-qr</span> :<span class="pl-e">text</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-smi">inviteUrl</span></span><span class="pl-pds">"</span> :<span class="pl-e">size</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-c1">200</span></span><span class="pl-pds">"</span>&gt;&lt;/<span class="pl-ent">vue-qr</span>&gt;
+<div class="highlight highlight-text-html-vue"><pre class="notranslate">      &lt;<span class="pl-ent">vue-qr</span> :<span class="pl-e">text</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-smi">inviteUrl</span></span><span class="pl-pds">"</span> :<span class="pl-e">size</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-c1">200</span></span><span class="pl-pds">"</span>&gt;&lt;/<span class="pl-ent">vue-qr</span>&gt;
 
 import vueQr from "vue-qr";
 
@@ -957,14 +957,14 @@ import vueQr from "vue-qr";
 
 <span class="pl-k">import</span> <span class="pl-v">VueClipboard</span> <span class="pl-k">from</span> <span class="pl-s">'vue-clipboard2'</span>
 <span class="pl-v">Vue</span><span class="pl-kos">.</span><span class="pl-en">use</span><span class="pl-kos">(</span><span class="pl-v">VueClipboard</span><span class="pl-kos">)</span></pre></div>
-<div class="highlight highlight-source-vue"><pre class="notranslate">      &lt;<span class="pl-ent">div</span>
+<div class="highlight highlight-text-html-vue"><pre class="notranslate">      &lt;<span class="pl-ent">div</span>
         <span class="pl-e">style</span>=<span class="pl-s1"><span class="pl-pds">"</span><span class="pl-c1"><span class="pl-c1">color</span></span>: <span class="pl-c1">#4c5fe6</span>; <span class="pl-c1"><span class="pl-c1">cursor</span></span>: <span class="pl-c1">pointer</span><span class="pl-pds">"</span></span>
         :<span class="pl-e">data-clipboard-text</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-smi">detail</span>.<span class="pl-smi">telephone</span></span><span class="pl-pds">"</span>
         @<span class="pl-e">click</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-smi">copy</span></span><span class="pl-pds">"</span>
       &gt;
         联系电话：{{ detail.telephone }} 复制
       &lt;/<span class="pl-ent">div</span>&gt;</pre></div>
-<div class="highlight highlight-source-vue"><pre class="notranslate">    copy() {
+<div class="highlight highlight-text-html-vue"><pre class="notranslate">    copy() {
       //如果需要回调：
       this.$copyText("需要复制的内容").then(
         (e) =&gt; {
@@ -988,7 +988,7 @@ import vueQr from "vue-qr";
 <h3>11.vscode的正则</h3>
 <p><code class="notranslate">^\s*(?=\r?$)\n</code> 替换空白行并删除的方法</p>
 <h3>12. picker</h3>
-<div class="highlight highlight-source-vue"><pre class="notranslate">        &lt;<span class="pl-ent">picker</span>
+<div class="highlight highlight-text-html-vue"><pre class="notranslate">        &lt;<span class="pl-ent">picker</span>
           class="type"
           @<span class="pl-e">change</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-smi">typeConfirm</span></span><span class="pl-pds">"</span>
           :<span class="pl-e">value</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-smi">typeIndex</span></span><span class="pl-pds">"</span>
@@ -1005,7 +1005,7 @@ import vueQr from "vue-qr";
           &lt;/view&gt;
         &lt;/<span class="pl-ent">picker</span>&gt;</pre></div>
 <h3>13. 手写canvas转图片</h3>
-<div class="highlight highlight-source-vue"><pre class="notranslate">    &lt;<span class="pl-ent">u-mask</span>
+<div class="highlight highlight-text-html-vue"><pre class="notranslate">    &lt;<span class="pl-ent">u-mask</span>
       :<span class="pl-e">show</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-smi">posterShow</span></span><span class="pl-pds">"</span>
       :<span class="pl-e">zoom</span>=<span class="pl-pds">"</span><span class="pl-s1"><span class="pl-c1">false</span></span><span class="pl-pds">"</span>
       :<span class="pl-e">custom-style</span>=<span class="pl-pds">"</span><span class="pl-s1">{ background: <span class="pl-s"><span class="pl-pds">'</span>rgba(0,0,0,.8)<span class="pl-pds">'</span></span> }</span><span class="pl-pds">"</span>
@@ -1095,7 +1095,7 @@ import vueQr from "vue-qr";
 <span class="pl-s1">    </span>&lt;/<span class="pl-ent">script</span>&gt;
 </pre></div>
 <h3>14.html2canvas 页面转图片</h3>
-<div class="highlight highlight-source-vue"><pre class="notranslate">&lt;<span class="pl-ent">script</span>&gt;<span class="pl-s1"></span>
+<div class="highlight highlight-text-html-vue"><pre class="notranslate">&lt;<span class="pl-ent">script</span>&gt;<span class="pl-s1"></span>
 <span class="pl-s1">    <span class="pl-en">generateImage</span>() {</span>
 <span class="pl-s1">      <span class="pl-k">const</span> <span class="pl-c1">element</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">"</span>target-element<span class="pl-pds">"</span></span>); <span class="pl-c"><span class="pl-c">//</span> 替换为目标元素的id或class</span></span>
 <span class="pl-s1">      <span class="pl-en">html2canvas</span>(element).<span class="pl-c1">then</span>(<span class="pl-smi">canvas</span> <span class="pl-k">=&gt;</span> {</span>
@@ -1208,7 +1208,7 @@ import vueQr from "vue-qr";
         <span class="pl-kos">&lt;</span><span class="pl-ent">div</span> <span class="pl-c1">class</span>="<span class="pl-s">tip</span>"<span class="pl-kos">&gt;</span>人力资源服务机构/零工中介<span class="pl-kos">&lt;/</span><span class="pl-ent">div</span><span class="pl-kos">&gt;</span>
     <span class="pl-kos">&lt;/</span><span class="pl-ent">div</span><span class="pl-kos">&gt;</span></pre></div>
 <h3>18. 表格滚动</h3>
-<div class="highlight highlight-source-vue"><pre class="notranslate">&lt;<span class="pl-ent">el-table</span>  ref="tableRef1"&gt;&lt;/<span class="pl-ent">el-table</span>&gt;
+<div class="highlight highlight-text-html-vue"><pre class="notranslate">&lt;<span class="pl-ent">el-table</span>  ref="tableRef1"&gt;&lt;/<span class="pl-ent">el-table</span>&gt;
 &lt;<span class="pl-ent">script</span> setup&gt;<span class="pl-s1"> </span>
 <span class="pl-s1">    <span class="pl-c"><span class="pl-c">//</span> 重置滚动高度</span></span>
 <span class="pl-s1">    <span class="pl-k">if</span> (<span class="pl-smi">tableRef1</span>.<span class="pl-c1">value</span>) {</span>
@@ -1242,7 +1242,7 @@ import vueQr from "vue-qr";
       <span class="pl-kos">}</span><span class="pl-kos">,</span> <span class="pl-c1">50</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
   <span class="pl-kos">}</span><span class="pl-kos">;</span></pre></div>
 <h3>19. 浙里办打开高德导航软件</h3>
-<div class="highlight highlight-source-vue"><pre class="notranslate">          if (this.OS == 'android') {
+<div class="highlight highlight-text-html-vue"><pre class="notranslate">          if (this.OS == 'android') {
 						ZWJSBridge.openLink({
 							"url": `androidamap://viewMap?sourceApplication=appname&amp;poiname=${address}&amp;lat=${latitude}&amp;lon=${longitude}&amp;dev=0`
 						}).then(res =&gt; {
